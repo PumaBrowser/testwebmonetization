@@ -8,75 +8,75 @@
   <title>Puma Unlock Demo</title>
 
   <script>
-      (function(d, s) {
-        var js = d.createElement(s),    
-        sc = d.getElementsByTagName(s)[0];  
-        js.src="https://paywall.unlock-protocol.com/static/unlock.latest.min.js";
-        sc.parentNode.insertBefore(js, sc); }(document, "script"));
+    (function(d, s) {
+      var js = d.createElement(s),    
+      sc = d.getElementsByTagName(s)[0];  
+      js.src="https://paywall.unlock-protocol.com/static/unlock.latest.min.js";
+      sc.parentNode.insertBefore(js, sc); }(document, "script"));
 
-      window.unlockProtocolConfig = {    
-        "pessimistic": true,    
-        "network": 4,           
-        "locks": {        
-          "0x7f389Df70E090849ec32869E28fc33DC522108f7": {
-            "name": "Puma lock priced in ETH"
-          },
-          "0xE13d43323746c7fBC5994c59b9FC7B992a72d7c4": {
-            "name": "Puma lock priced in PC (Puma Coin)"
-          }
+    window.unlockProtocolConfig = {    
+      "pessimistic": true,    
+      "network": 4,           
+      "locks": {        
+        "0x7f389Df70E090849ec32869E28fc33DC522108f7": {
+          "name": "Puma lock priced in ETH"
         },
-        "icon": "https://test.puma.tech/puma_round_200.png",    
-        "callToAction": {        
-          "default": "Get the key on Rinkeby",
-          "expired": "The lock has expired. Please renew",
-          "metadata": "Please fill in the following:"   
-        },    
-        "metadataInputs": [
-          {            
-            "name": "How should we call you?",            
-            "type": "text",            
-            "required": true        
-          },
-          {            
-            "name": "Where can we reach you? (email)",            
-            "type": "text",            
-            "required": false       
-          },
-        ]
-      }
+        "0xE13d43323746c7fBC5994c59b9FC7B992a72d7c4": {
+          "name": "Puma lock priced in PC (Puma Coin)"
+        }
+      },
+      "icon": "https://test.puma.tech/puma_round_200.png",    
+      "callToAction": {        
+        "default": "Get the key on Rinkeby",
+        "expired": "The lock has expired. Please renew",
+        "metadata": "Please fill in the following:"   
+      },    
+      "metadataInputs": [
+        {            
+          "name": "How should we call you?",            
+          "type": "text",            
+          "required": true        
+        },
+        {            
+          "name": "Where can we reach you? (email)",            
+          "type": "text",            
+          "required": false       
+        },
+      ]
+    }
 
-      function logEvent(e){
-        container.innerText = container.innerText + 
-          JSON.stringify(e, null, 2) + 
-          JSON.stringify(e.detail, null, 2) + '\n\n';
-        console.log(e);
-      }
+    function logEvent(e){
+      container.innerText = container.innerText + 
+        "Event type:" + JSON.stringify(e.type, null, 2) + '\n' +
+        "Event details" + JSON.stringify(e.detail, null, 2) + '\n\n';
+      console.log(e);
+    }
 
-      window.addEventListener('unlockProtocol.status', logEvent)
-      window.addEventListener('unlockProtocol.authenticated', logEvent)
-      window.addEventListener('unlockProtocol.transactionSent', logEvent)
-    </script>
+    window.addEventListener('unlockProtocol.status', logEvent)
+    window.addEventListener('unlockProtocol.authenticated', logEvent)
+    window.addEventListener('unlockProtocol.transactionSent', logEvent)
+  </script>
 
-    <!-- from unlock tutorial-->
-    <script>
-      window.addEventListener("unlockProtocol.status", function (event) {
-        // We hide all .unlock-content elements
-        document.querySelector(".unlock-content").style.display = "none";
-        // We show only the relevant element
-        document
-          .querySelectorAll(`.unlock-content.${event.detail.state}`)
-          .forEach((element) => {
-            element.style.display = "block";
-          });
-      });
+  <!-- from unlock tutorial-->
+  <script>
+    window.addEventListener("unlockProtocol.status", function (event) {
+      // We hide all .unlock-content elements
+      document.querySelector(".unlock-content").style.display = "none";
+      // We show only the relevant element
+      document
+        .querySelectorAll(`.unlock-content.${event.detail.state}`)
+        .forEach((element) => {
+          element.style.display = "block";
+        });
+    });
 
-      window.addEventListener("unlockProtocol.authenticated", function (event) {
-        // event.detail.addresss includes the address of the current user, when known
-      });
+    window.addEventListener("unlockProtocol.authenticated", function (event) {
+      // event.detail.addresss includes the address of the current user, when known
+    });
 
-      window.addEventListener("unlockProtocol.transactionSent", function (event) {
-        // event.detail.hash includes the hash of the transaction sent
-      });
+    window.addEventListener("unlockProtocol.transactionSent", function (event) {
+      // event.detail.hash includes the hash of the transaction sent
+    });
       
   </script>
 
@@ -92,6 +92,23 @@
 
     .unlock-content .unlocked {
       display: none;
+    }
+  </style>
+
+  <style>
+    body{
+      font-family:sans-serif;
+    }
+
+    #container{
+      background-color:lightgreen;
+      padding:10px;
+    }
+
+    .error{
+      display:none;
+      background-color:pink;
+      padding:10px;
     }
   </style>
 
