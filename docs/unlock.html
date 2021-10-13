@@ -16,13 +16,12 @@
 
       window.unlockProtocolConfig = {    
         "pessimistic": true,    
+        "network": 4,           
         "locks": {        
           "0x7f389Df70E090849ec32869E28fc33DC522108f7": {
-            "network": 4,           
             "name": "Puma lock priced in ETH"
           },
           "0xE13d43323746c7fBC5994c59b9FC7B992a72d7c4": {
-            "network": 4,           
             "name": "Puma lock priced in PC (Puma Coin)"
           }
         },
@@ -48,7 +47,8 @@
 
       function logEvent(e){
         container.innerText = container.innerText + 
-          JSON.stringify(e, null, 2) + '\n\n';
+          JSON.stringify(e, null, 2) + 
+          JSON.stringify(e.detail, null, 2) + '\n\n';
         console.log(e);
       }
 
