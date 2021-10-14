@@ -8,12 +8,6 @@
   <title>Puma Unlock Demo</title>
 
   <script>
-    (function(d, s) {
-      var js = d.createElement(s),    
-      sc = d.getElementsByTagName(s)[0];  
-      js.src="https://paywall.unlock-protocol.com/static/unlock.latest.min.js";
-      sc.parentNode.insertBefore(js, sc); }(document, "h1"));
-
     window.unlockProtocolConfig = {    
       "pessimistic": true,    
       "network": 4,           
@@ -104,7 +98,14 @@
 
 <body>
 
+
 <h1>Simple Unlock Demo</h1>
+<script>
+  (function(d, s) {
+    var js = d.createElement(s),    
+    sc = d.getElementsByTagName(s)[0];  
+    js.src="https://paywall.unlock-protocol.com/static/unlock.latest.min.js";
+    sc.parentNode.insertBefore(js, sc); }(document, "h1")); </script>
 
 <!-- container to display unlock events -->
 <pre id="container">
