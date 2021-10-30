@@ -41,11 +41,22 @@
   </script>
 
   <script>
-    window.addEventListener("unlockProtocol.status", function (event) {
-      var locks = event.locks
-      for (lock in locks){
-        container.innerText += lock
+    window.addEventListener("unlockProtocol.status", function (event){
+      if (event.detail.state != "unlocked") {
+      	return
       }
+      
+      //looks like array, but is a string
+      var lock = event.detail.locks
+      if ( lock == "0x7f389Df70E090849ec32869E28fc33DC522108f7" ){
+      	lock1locked.style.display = "none"
+        lock1unlocked.style.display = "block"
+      }
+      if ( lock == "0xE13d43323746c7fBC5994c59b9FC7B992a72d7c4" ){
+      	lock2locked.style.display = "none"
+        lock2unlocked.style.display = "block"
+      }
+      
     });
   
   </script>
