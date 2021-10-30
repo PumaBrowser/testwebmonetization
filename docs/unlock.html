@@ -40,43 +40,15 @@
     window.addEventListener('unlockProtocol.transactionSent', logEvent)
   </script>
 
-  <!-- from unlock tutorial-->
   <script>
     window.addEventListener("unlockProtocol.status", function (event) {
-      // We hide all .unlock-content elements
-      document.querySelector(".unlock-content").style.display = "none";
-      // We show only the relevant element
-      document
-        .querySelectorAll(`.unlock-content.${event.detail.state}`)
-        .forEach((element) => {
-          element.style.display = "block";
-        });
+      var locks = event.locks
+      for (lock in locks){
+        container.innerText += lock
+      }
     });
-
-    window.addEventListener("unlockProtocol.authenticated", function (event) {
-      // event.detail.addresss includes the address of the current user, when known
-    });
-
-    window.addEventListener("unlockProtocol.transactionSent", function (event) {
-      // event.detail.hash includes the hash of the transaction sent
-    });
-      
+  
   </script>
-
-  <!-- from unlock tutorial-->
-  <style>
-    .unlock-content {
-      display: none;
-    }
-
-    .unlock-content .locked {
-      display: none;
-    }
-
-    .unlock-content .unlocked {
-      display: none;
-    }
-  </style>
 
   <style>
     body{
@@ -106,10 +78,17 @@
 <pre id="container">
 </pre>
 
-<!-- from unlock tutorial-->
-<p class="unlock-content locked">Unlock Demo is currently locked 🔒 </p>
-<p class="unlock-content unlocked">Unlock Demo is currently unlocked 🎉</p>
-<p class="unlock-content locked" onclick="window.unlockProtocol && window.unlockProtocol.loadCheckoutModal()"><button class="button">
+<h5>Puma lock priced in ETH</h5>
+<p id="lock1locked" >Lock 1 is locked 🔒 </p>
+<p id="lock1unlocked" style="display:none">Lock 1 is unlocked 🎉</p>
+
+<h5>Puma lock priced in PC</h5>
+<p id="lock2locked">Lock 2 is locked 🔒 </p>
+<p id="lock2unlocked" style="display:none">Lock 2 is unlocked 🎉</p>
+
+
+
+<p id="buy_button" onclick="window.unlockProtocol && window.unlockProtocol.loadCheckoutModal()"><button class="button">
     Unlock!
   </button></p>
 
