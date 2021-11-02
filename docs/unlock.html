@@ -14,10 +14,13 @@
       "network": 4,           
       "locks": {        
         "0x7f389Df70E090849ec32869E28fc33DC522108f7": {
-          "name": "Puma lock priced in ETH"
+          "name": "Puma lock priced in ETH. Free"
         },
         "0xE13d43323746c7fBC5994c59b9FC7B992a72d7c4": {
-          "name": "Puma lock priced in PC (Puma Coin)"
+          "name": "Puma lock priced in PC (Puma Coin). Free"
+        },
+        "0x2B0ed09862Bb5BbC43DfcE2D29629a34EdC2B664":{
+          "name": "Puma lock priced in ETH. Cost 0.0001"
         }
       },
       "icon": "https://test.puma.tech/puma_round_200.png",    
@@ -56,6 +59,10 @@
       	lock2locked.style.display = "none"
         lock2unlocked.style.display = "block"
       }
+      if ( lock == "0x2B0ed09862Bb5BbC43DfcE2D29629a34EdC2B664"){
+        lock3locked.style.display = "none"
+        lock3unlocked.style.display = "block"
+      }
       
     });
   
@@ -89,15 +96,17 @@
 <pre id="container">
 </pre>
 
-<h5>Puma lock priced in ETH</h5>
+<h5>Puma lock priced in ETH (free)</h5>
 <p id="lock1locked" >Lock 1 is locked 🔒 </p>
 <p id="lock1unlocked" style="display:none">Lock 1 is unlocked 🎉</p>
 
-<h5>Puma lock priced in PC</h5>
+<h5>Puma lock priced in PC (free)</h5>
 <p id="lock2locked">Lock 2 is locked 🔒 </p>
 <p id="lock2unlocked" style="display:none">Lock 2 is unlocked 🎉</p>
 
-
+<h5>Puma lock priced in Eth (0.0001)</h5>
+<p id="lock3locked">Lock 2 is locked 🔒 </p>
+<p id="lock3unlocked" style="display:none">Lock 2 is unlocked 🎉</p>
 
 <p id="buy_button" onclick="window.unlockProtocol && window.unlockProtocol.loadCheckoutModal()"><button class="button">
     Unlock!
