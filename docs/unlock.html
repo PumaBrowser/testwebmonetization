@@ -42,15 +42,31 @@
       	logString(container, lock) 
         if ( lock == "0x7f389Df70E090849ec32869E28fc33DC522108f7" ){
           logTo(container1, event)
+          if (event.detail.state != "unlocked") {
+      	    lock1locked.style.display = "none"
+            lock1unlocked.style.display = "block"
+          }
         }
         if ( lock == "0xE13d43323746c7fBC5994c59b9FC7B992a72d7c4" ){
           logTo(container2, event)
+          f (event.detail.state != "unlocked") {
+      	    lock2locked.style.display = "none"
+            lock2unlocked.style.display = "block"
+          }
         }
         if ( lock == "0x2B0ed09862Bb5BbC43DfcE2D29629a34EdC2B664"){
           logTo(container3, event)
+          f (event.detail.state != "unlocked") {
+      	    lock3locked.style.display = "none"
+            lock3unlocked.style.display = "block"
+          }
         }
         if ( lock == "0x63A2AA0e9ff0dF21E362c7D6E79A2218767C1EDE"){
           logTo(container4, event)
+          f (event.detail.state != "unlocked") {
+      	    lock4locked.style.display = "none"
+            lock4unlocked.style.display = "block"
+          }
         }
       })
     }
