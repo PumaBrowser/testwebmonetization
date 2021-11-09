@@ -21,6 +21,9 @@
         },
         "0x2B0ed09862Bb5BbC43DfcE2D29629a34EdC2B664":{
           "name": "Puma lock priced in ETH. Cost 0.0001"
+        },
+        "0x63A2AA0e9ff0dF21E362c7D6E79A2218767C1EDE":{
+          "name": "Second Puma lock priced in ETH. Cost 0.0001"
         }
       },
       "icon": "https://test.puma.tech/puma_round_200.png",    
@@ -31,11 +34,38 @@
       }
     }
 
-    function logEvent(e){
+    function logEvent(event){
+      logTo(container, event)
+
+      var locks = event.detail.locks
+      locks.forEach(function(lock){
+      	logString(container, lock) 
+        if ( lock == "0x7f389Df70E090849ec32869E28fc33DC522108f7" ){
+          logTo(container1, event)
+        }
+        if ( lock == "0xE13d43323746c7fBC5994c59b9FC7B992a72d7c4" ){
+          logTo(container2, event)
+        }
+        if ( lock == "0x2B0ed09862Bb5BbC43DfcE2D29629a34EdC2B664"){
+          logTo(container3, event)
+        }
+        if ( lock == "0x63A2AA0e9ff0dF21E362c7D6E79A2218767C1EDE"){
+          logTo(container4, event)
+        }
+      })
+    }
+
+    function logTo(container, e){
       container.innerText = container.innerText + 
         "Event type:" + JSON.stringify(e.type, null, 2) + '\n' +
         "Event details" + JSON.stringify(e.detail, null, 2) + '\n\n';
       console.log(e);
+    }
+    
+    function logString(container, s){
+      container.innerText = container.innerText + 
+        "String:" + s + '\n\n';
+      console.log(s);
     }
 
     window.addEventListener('unlockProtocol.status', logEvent)
@@ -63,6 +93,11 @@
         lock3locked.style.display = "none"
         lock3unlocked.style.display = "block"
       }
+      if ( lock == "0x63A2AA0e9ff0dF21E362c7D6E79A2218767C1EDE"){
+        lock4locked.style.display = "none"
+        lock4unlocked.style.display = "block"
+      }
+      
       
     });
   
@@ -73,7 +108,7 @@
       font-family:sans-serif;
     }
 
-    #container{
+    pre.container{
       background-color:lightgreen;
       padding:10px;
     }
@@ -92,24 +127,41 @@
 <script src="https://paywall.unlock-protocol.com/static/unlock.latest.min.js" async=""></script>
 <h1>Simple Unlock Demo</h1>
 
-<!-- container to display unlock events -->
-<pre id="container">
-</pre>
-
 <h5>Puma lock priced in ETH (free)</h5>
 <p id="lock1locked" >Lock 1 is locked 🔒 </p>
 <p id="lock1unlocked" style="display:none">Lock 1 is unlocked 🎉</p>
+<!-- container to display unlock events -->
+<pre id="container1" class="container">
+</pre>
 
 <h5>Puma lock priced in PC (free)</h5>
 <p id="lock2locked">Lock 2 is locked 🔒 </p>
 <p id="lock2unlocked" style="display:none">Lock 2 is unlocked 🎉</p>
+<!-- container to display unlock events -->
+<pre id="container2" class="container">
+</pre>
 
 <h5>Puma lock priced in Eth (0.0001)</h5>
-<p id="lock3locked">Lock 2 is locked 🔒 </p>
-<p id="lock3unlocked" style="display:none">Lock 2 is unlocked 🎉</p>
+<p id="lock3locked">Lock 3 is locked 🔒 </p>
+<p id="lock3unlocked" style="display:none">Lock 3 is unlocked 🎉</p>
+<!-- container to display unlock events -->
+<pre id="container3" class="container">
+</pre>
+
+<h5>Second Puma lock priced in Eth (0.0001)</h5>
+<p id="lock4locked">Lock 4 is locked 🔒 </p>
+<p id="lock4unlocked" style="display:none">Lock 4 is unlocked 🎉</p>
+
+<!-- container to display unlock events -->
+<pre id="container4" class="container">
+</pre>
 
 <p id="buy_button" onclick="window.unlockProtocol && window.unlockProtocol.loadCheckoutModal()"><button class="button">
     Unlock!
   </button></p>
+
+ <h5>All events</h5> 
+  <pre id="container" class="container">
+  </pre>
 
 </html>
