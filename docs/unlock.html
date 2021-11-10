@@ -37,9 +37,21 @@
     function logEvent(event){
       logTo(container, event)
 
+      //locked event has no locks to it
+      if (event.detail.state == "locked") {
+        lock1locked.style.display = "block"
+        lock1unlocked.style.display = "none"
+        lock2locked.style.display = "block"
+        lock2unlocked.style.display = "none"
+        lock3locked.style.display = "block"
+        lock3unlocked.style.display = "none"
+        lock4locked.style.display = "block"
+        lock4unlocked.style.display = "none"
+      }
+
       var locks = event.detail.locks
       locks.forEach(function(lock){
-      	logString(container, lock) 
+      	logString(container, "Lock address: " + lock) 
         if ( lock == "0x7f389Df70E090849ec32869E28fc33DC522108f7" ){
           logTo(container1, event)
           if (event.detail.state == "unlocked") {
