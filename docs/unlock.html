@@ -62,13 +62,20 @@
       logTo(container, event)
 
       var locks = event.detail.locks
+
+      if ( !locks ){
+        locks = Object.keys(window.unlockProtocolConfig.locks)
+      }
       
       locks.forEach(function(lock){
       	var container = document.getElementById(lock.substr(15) + "container")
         logTo(container, event)
         if (event.detail.state == "unlocked"){
         	document.getElementById(lock.substr(15) + "locked").style.display = "none"
-            document.getElementById(lock.substr(15) + "unlocked").style.display = "block"
+          document.getElementById(lock.substr(15) + "unlocked").style.display = "block"
+        }else{
+          document.getElementById(lock.substr(15) + "locked").style.display = "block"
+          document.getElementById(lock.substr(15) + "unlocked").style.display = "none"
         }
         
         
@@ -122,18 +129,18 @@
         div.appendChild(line3)
         div.appendChild(line4)
         
-		document.body.appendChild(div)
+		    document.body.appendChild(div)
       }
       
       var div = document.createElement('div')
       div.innerHTML = 
-      "<p id='buy_button' onclick='window.unlockProtocol && window.unlockProtocol.loadCheckoutModal()''><button class='button'>" + 
-      "Unlock!" +
-      "</button></p>" +
-      "<h3>All events</h3> " +
-      "<pre id='container' class='container'>" +
-      "</pre>"
-	  document.body.appendChild(div)
+        "<p id='buy_button' onclick='window.unlockProtocol && window.unlockProtocol.loadCheckoutModal()''><button class='button'>" + 
+        "Unlock!" +
+        "</button></p>" +
+        "<h3>All events</h3> " +
+        "<pre id='container' class='container'>" +
+        "</pre>"
+	    document.body.appendChild(div)
     }
   
   </script>
