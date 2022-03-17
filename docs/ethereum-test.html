@@ -105,6 +105,7 @@
     }
 
     function updateStatus(message){
+        document.getElementById("logging").style.display = "block"
         var container = document.getElementById("status")
         container.innerText =  message;
     }
@@ -139,12 +140,16 @@
         }
 
         document.getElementById("inputs").style.display = "none"
+        
 
         return true
     }
 
     function runTest(func,params){
         statusAndLog(`running ${fun} with ${params} on web3`)
+        window.setup.web3Running = true
+        window.setup.web3Result = ""
+        window.setup.ethereumResult = ""
         window.setup.web3.currentProvider.sendAsync({
             method: func,
             params: params,
@@ -152,12 +157,47 @@
             id: new Date().getTime()
             }).then(
                 function (result){
-
+                    addToLog("web3 result:" + result)
+                    statusAndLog("web3 success")
+                    window.setup.web3Running = false
+                    window.setup.web3Result = result
                 },
                 function (error){
-
+                    addToLog("web3 error:" + error)
+                    statusAndLog("web3 error")
+                    window.setup.web3Running = false
+                    window.setup.web3Result = error
                 }
             )
+        while ( window.setup.web3Running ){
+            sleep(1000)
+        }
+        window.setup.ethereumRunning = true
+        window.ethereum.request({ method: func, params: params }).then(
+            function (result){
+                addToLog("ethereum result:" + result)
+                statusAndLog("ethereum success")
+                window.setup.ethereumResult = result
+                window.setup.ethereumRunning = false
+            },
+            function (error){
+                addToLog("web3 error:" + error)
+                statusAndLog("web3 error")
+                window.setup.ethereumRunning = false
+                window.setup.web3Result = error
+            }
+        )
+        while ( window.setup.ethereumRunning ){
+            sleep(1000)
+        }
+        if ( window.setup.ethereumResult  == window.setup.web3Result){
+            statusAndLog("results are the same")
+            return true
+        }else{
+            statusAndLog("results are the not the same")
+            return false
+        }
+        
     }
 
     function test(){
@@ -165,8 +205,11 @@
             //add entered values back to the fields
             document.getElementById("node").value = window.setup.address
             document.getElementById("pk").value = window.setup.pk
+            updateStatus("setup failed")
             return
         }
+
+        statusAndLog("starting tests")
 
         window.setup.testDone = true
 
@@ -175,7 +218,9 @@
                 sleep(1000)
             }
             window.setup.testDone = false
-            runTest(key, window.tests[key])
+            if ( !runTest(key, window.tests[key])){
+                return
+            }
 
         }
     }
@@ -211,7 +256,12 @@
 
 </div>
 
+<div id="logging" style="display: none;">
+<p>Current test status</p>
 <div id="status"></div>
+<br>
+<p>Log:</p>
 <div id="log"></div>
-
+</div>
+</body> 
 </html>
