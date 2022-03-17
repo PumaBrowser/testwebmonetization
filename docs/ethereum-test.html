@@ -219,7 +219,7 @@
                 updateStatus("waiting for last test")
             }
             window.setup.testDone = false
-            if ( !runTest(key, window.tests[key])){
+            if ( !runTest(key, window.setup.tests[key])){
                 return
             }
 
