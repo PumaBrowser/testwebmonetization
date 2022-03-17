@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Puma Ethereum API Test</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+
+
+  <script>
+        window.setup = {}
+
+        //key - rpc method
+        //value - parameters
+        window.setup.tests = {
+            "eth_accounts":[],
+            "eth_blockNumber":[],
+            "eth_call":[],
+            "eth_chainId":[],
+            "eth_coinbase":[],
+            "eth_compileLLL":[],
+            "eth_compileSerpent":[],
+            "eth_compileSolidity":[],
+            "eth_decrypt":[],
+            "eth_estimateGas":[],
+            "eth_feeHistory":[],
+            "eth_gasPrice":[],
+            "eth_getBalance":[],
+            "eth_getBlockByHash":[],
+            "eth_getBlockByNumber":[],
+            "eth_getBlockTransactionCountByHash":[],
+            "eth_getBlockTransactionCountByNumber":[],
+            "eth_getCode":[],
+            "eth_getCompilers":[],
+            "eth_getEncryptionPublicKey":[],
+            "eth_getFilterChanges":[],
+            "eth_getFilterLogs":[],
+            "eth_getLogs":[],
+            "eth_getProof":[],
+            "eth_getStorageAt":[],
+            "eth_getTransactionByBlockHashAndIndex":[],
+            "eth_getTransactionByBlockNumberAndIndex":[],
+            "eth_getTransactionByHash":[],
+            "eth_getTransactionCount":[],
+            "eth_getTransactionReceipt":[],
+            "eth_getUncleByBlockHashAndIndex":[],
+            "eth_getUncleByBlockNumberAndIndex":[],
+            "eth_getUncleCountByBlockHash":[],
+            "eth_getUncleCountByBlockNumber":[],
+            "eth_getWork":[],
+            "eth_hashrate":[],
+            "eth_mining":[],
+            "eth_newBlockFilter":[],
+            "eth_newFilter":[],
+            "eth_newPendingTransactionFilter":[],
+            "eth_protocolVersion":[],
+            "eth_sendRawTransaction":[],
+            "eth_sendTransaction":[],
+            "eth_sign":[],
+            "eth_signTransaction":[],
+            "eth_signTypedData":[],
+            "eth_signTypedData_v1":[],
+            "eth_signTypedData_v3":[],
+            "eth_signTypedData_v4":[],
+            "eth_submitHashrate":[],
+            "eth_submitWork":[],
+            "eth_syncing":[],
+            "eth_uninstallFilter":[],
+            "metamask_getProviderState":[],
+            "metamask_watchAsset":[],
+            "net_listening":[],
+            "net_peerCount":[],
+            "net_version":[],
+            "personal_ecRecover":[],
+            "personal_sign":[],
+            "shh_addToGroup":[],
+            "shh_getFilterChanges":[],
+            "shh_getMessages":[],
+            "shh_hasIdentity":[],
+            "shh_newFilter":[],
+            "shh_newGroup":[],
+            "shh_newIdentity":[],
+            "shh_post":[],
+            "shh_uninstallFilter":[],
+            "shh_version":[],
+            "wallet_watchAsset":[],
+            "web3_clientVersion":[],
+            "web3_sha3":[]
+    }
+
+    
+
+    function statusAndLog(message){
+        addToLog(message)
+        updateStatus(message)
+    }
+
+    function addToLog(message){
+        var container = document.getElementById("log")
+        container.innerText = container.innerText + 
+            message + '\n';
+    }
+
+    function updateStatus(message){
+        var container = document.getElementById("status")
+        container.innerText =  message;
+    }
+
+    function setupConnections(){
+        //check inputs
+        window.setup.address = document.getElementById("node").value
+        window.setup.pk = document.getElementById("pk").value
+
+        if( window.setup.address == "" || window.setup.pk == "" ){
+            document.getElementById("inputs").innerHTML = 
+                "<p> Please enter node address and primary key of the test account</p>" +
+                document.getElementById("inputs").innerHTML
+                return false
+        }
+        
+        if ( !window.ethereum ){
+            document.getElementById("inputs").innerHTML = 
+                "<p> window.ethereum is not defined. </p>" +
+                document.getElementById("inputs").innerHTML
+                return false
+        }
+
+        if ( window.Web3 ){
+            statusAndLog(`web3 setup with "${window.setup.address}"`)
+            window.setup.web3 = new window.Web3(window.setup.address);
+        }else{
+            document.getElementById("inputs").innerHTML = 
+                "<p> Web 3 is not loaded, give it a moment </p>" +
+                document.getElementById("inputs").innerHTML
+                return false
+        }
+
+        document.getElementById("inputs").style.display = none
+
+        return true
+    }
+
+    function runTest(func,params){
+        statusAndLog(`running ${fun} with ${params} on web3`)
+        window.setup.web3.currentProvider.sendAsync({
+            method: func,
+            params: params,
+            jsonrpc: "2.0",
+            id: new Date().getTime()
+            }).then(
+                function (result){
+
+                },
+                function (error){
+
+                }
+            )
+    }
+
+    function test(){
+        if ( !setupConnections() ){
+            //add entered values back to the fields
+            document.getElementById("node").value = window.setup.address
+            document.getElementById("pk").value = window.setup.pk
+            return
+        }
+
+        window.setup.testDone = true
+
+        for (var key in window.tests){
+            while ( !window.setup.testDone ){
+                sleep(1000)
+            }
+            window.setup.testDone = false
+            runTest(key, window.tests[key])
+
+        }
+    }
+
+  </script>
+
+  <style>
+    body{
+      font-family:sans-serif;
+    }
+
+    pre.container{
+      background-color:lightgreen;
+      padding:10px;
+    }
+
+    .error{
+      display:none;
+      background-color:pink;
+      padding:10px;
+    }
+  </style>
+
+</head>
+
+<body>
+
+<div id="inputs">
+    <p>It is advised to use test network and test account as some transactions use up gas</p>
+    <p>Node address: <input type="text" id="node" size="90%"/> </p>
+    <p>PK to use: <input type="text" id="pk" size="90%"/> </p>
+    <p><input type="button" value="start tests" onclick="test()"/></p>
+
+</div>
+
+<div id="status"></div>
+<div id="log"></div>
+
+</html>
