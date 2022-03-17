@@ -213,9 +213,10 @@
 
         window.setup.testDone = true
 
-        for (var key in window.tests){
+        for (var key in window.setup.tests){
             while ( !window.setup.testDone ){
                 sleep(1000)
+                updateStatus("waiting for last test")
             }
             window.setup.testDone = false
             if ( !runTest(key, window.tests[key])){
