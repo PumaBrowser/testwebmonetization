@@ -155,20 +155,21 @@
             params: params,
             jsonrpc: "2.0",
             id: new Date().getTime()
-            }).then(
-                function (result){
-                    addToLog("web3 result:" + result)
-                    statusAndLog("web3 success")
-                    window.setup.web3Running = false
-                    window.setup.web3Result = result
-                },
-                function (error){
+            },
+            function (error, result){
+                if( errro ){
                     addToLog("web3 error:" + error)
                     statusAndLog("web3 error")
-                    window.setup.web3Running = false
                     window.setup.web3Result = error
+                }else {
+                    addToLog("web3 result:" + result)
+                    statusAndLog("web3 success")
+                    window.setup.web3Result = result
                 }
-            )
+                window.setup.web3Running = false
+                
+            }
+        )
         while ( window.setup.web3Running ){
             sleep(1000)
         }
