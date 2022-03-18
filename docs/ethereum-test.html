@@ -16,12 +16,19 @@
         }
         window.setup = {}
 
+        window.setup.error = {
+            "eth_call":[],
+        }
+
+
         //key - rpc method
         //value - parameters
         window.setup.tests = {
             //"eth_accounts":[], special case, no result from network. Need another test
             "eth_blockNumber":[],
-            "eth_call":[],
+            "eth_call":[{to: "0xccf20531fe0d10740e9de0f11cc57d91f833e6de",
+                         data: "0xd1bbd49c"},
+                        "latest"],
             "eth_chainId":[],
             "eth_coinbase":[],
             "eth_compileLLL":[],
@@ -182,16 +189,16 @@
         statusAndLog(`running ${func} with ${JSON.stringify(params)} on ethereum`)
         window.ethereum.request({ method: func, params: params }).then(
             function (result){
-                addToLog("ethereum result:" + result)
+                addToLog("ethereum result:" + JSON.stringify(result))
                 statusAndLog("ethereum success")
                 window.setup.ethereumResult = result
                 window.setup.ethereumRunning = false
             },
             function (error){
-                addToLog("ethereum error:" + error)
+                addToLog("ethereum error:" + JSON.stringify(error))
                 statusAndLog("ethereum error")
                 window.setup.ethereumRunning = false
-                window.setup.web3Result = error
+                window.setup.ethereumResult = error
             }
         )
     }
