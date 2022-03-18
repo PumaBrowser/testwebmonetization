@@ -11,6 +11,9 @@
 
 
   <script>
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
         window.setup = {}
 
         //key - rpc method
@@ -145,9 +148,7 @@
         return true
     }
 
-    function runTest(func,params){
-        statusAndLog(`running ${func} with ${params} on web3`)
-        window.setup.web3Running = true
+    function runWeb3(func,params){
         window.setup.web3Result = ""
         window.setup.ethereumResult = ""
         window.setup.web3.currentProvider.send({
@@ -157,7 +158,7 @@
             id: new Date().getTime()
             },
             function (error, result){
-                if( errro ){
+                if( error ){
                     addToLog("web3 error:" + error)
                     statusAndLog("web3 error")
                     window.setup.web3Result = error
@@ -170,10 +171,9 @@
                 
             }
         )
-        while ( window.setup.web3Running ){
-            sleep(1000)
-        }
-        window.setup.ethereumRunning = true
+    }
+
+    function runEthereum(func, params){
         window.ethereum.request({ method: func, params: params }).then(
             function (result){
                 addToLog("ethereum result:" + result)
@@ -188,16 +188,58 @@
                 window.setup.web3Result = error
             }
         )
-        while ( window.setup.ethereumRunning ){
-            sleep(1000)
+    }
+
+    function wait({code,ms,check,message= "", count = 0}){
+        setTimeout(() => {
+            if(!check()){
+                statusAndLog(`waiting (${message}), count is ${count}` )
+                count++
+                wait({code,ms,check,message, count})
+            }else{
+                code()
+            }
         }
-        if ( window.setup.ethereumResult  == window.setup.web3Result){
-            statusAndLog("results are the same")
-            return true
-        }else{
-            statusAndLog("results are the not the same")
-            return false
-        }
+        ,ms)
+    }
+
+    function runTest(func,params){
+        statusAndLog(`running ${func} with ${params} on web3`)
+
+        window.setup.web3Running = true
+        runWeb3(func,params)
+
+        wait({
+            code: () => {
+                window.setup.ethereumRunning = true
+                runEthereum(func, params)
+                wait({
+                    code: () => {
+                        if ( window.setup.ethereumResult  == window.setup.web3Result){
+                        statusAndLog("results are the same")
+                    }else{
+                        statusAndLog("results are the not the same")
+                        window.setup.testFailed = true
+                    }
+                    window.setup.testRunning = false
+                },
+                ms: 1000,
+                check: () => {return window.setup.ethereumRunning == false },
+                message: `${func} on ethereum`
+            })
+            },
+            ms: 1000,
+            check: () => {return window.setup.web3Running == false },
+            message: `${func} on web 3`
+        })
+
+       
+        
+
+        
+        
+        
+        
         
     }
 
@@ -207,25 +249,40 @@
             document.getElementById("node").value = window.setup.address
             document.getElementById("pk").value = window.setup.pk
             updateStatus("setup failed")
-            return
+            //return
         }
 
         statusAndLog("starting tests")
 
-        window.setup.testDone = true
+        window.setup.testFailed = false
+        window.setup.testRunning = false
 
-        for (var key in window.setup.tests){
-            while ( !window.setup.testDone ){
-                sleep(1000)
-                updateStatus("waiting for last test")
-            }
-            window.setup.testDone = false
-            if ( !runTest(key, window.setup.tests[key])){
-                return
-            }
-
-        }
+        mainLoop(0)
+        
     }
+
+    function mainLoop(count){
+        wait({
+            code: () => {
+                if( count >= Object.keys(window.setup.tests).length ){
+                    statusAndLog("done")
+                    return
+                }
+                if(  window.setup.testFailed == true){
+                    return
+                }
+                var func = Object.keys(window.setup.tests).sort()[count]
+                var params = window.setup.tests[func]
+                window.setup.testRunning = true
+                runTest(func,params)
+                mainLoop(count+1)
+            },
+            ms: 1000,
+            check: () => {return window.setup.testRunning == false },
+            message:"main"
+        })
+    }
+
 
   </script>
 
