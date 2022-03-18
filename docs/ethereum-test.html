@@ -16,21 +16,24 @@
         }
         window.setup = {}
 
-        window.setup.error = {
+        window.setup.errorTests = {
             "eth_call":[],
+        }
+
+        window.setup.onlyEthereumTests = {
+            "eth_accounts":[],
+            "eth_coinbase":[],
         }
 
 
         //key - rpc method
         //value - parameters
         window.setup.tests = {
-            //"eth_accounts":[], special case, no result from network. Need another test
             "eth_blockNumber":[],
             "eth_call":[{to: "0xccf20531fe0d10740e9de0f11cc57d91f833e6de",
                          data: "0xd1bbd49c"},
                         "latest"],
             "eth_chainId":[],
-            "eth_coinbase":[],
             "eth_compileLLL":[],
             "eth_compileSerpent":[],
             "eth_compileSolidity":[],
