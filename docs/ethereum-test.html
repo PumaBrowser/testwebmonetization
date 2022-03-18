@@ -19,7 +19,7 @@
         //key - rpc method
         //value - parameters
         window.setup.tests = {
-            "eth_accounts":[],
+            //"eth_accounts":[], special case, no result from network. Need another test
             "eth_blockNumber":[],
             "eth_call":[],
             "eth_chainId":[],
@@ -159,13 +159,13 @@
             },
             function (error, result){
                 if( error ){
-                    addToLog("web3 error:" + error)
+                    addToLog("web3 error:" + JSON.stringify(error))
                     statusAndLog("web3 error")
                     window.setup.web3Result = error
                 }else {
-                    addToLog("web3 result:" + result)
+                    addToLog("web3 result:" + JSON.stringify(result))
                     statusAndLog("web3 success")
-                    window.setup.web3Result = result
+                    window.setup.web3Result = result["result"]
                 }
                 window.setup.web3Running = false
                 
@@ -233,14 +233,6 @@
             message: `${func} on web 3`
         })
 
-       
-        
-
-        
-        
-        
-        
-        
     }
 
     function test(){
