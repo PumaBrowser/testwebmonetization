@@ -55,7 +55,7 @@
             "eth_getBlockTransactionCountByNumber":[],
             "eth_getCode":[],
             "eth_getCompilers":[],
-            "eth_getFilterChanges":[1],
+            "eth_getFilterChanges":["0x10ff0ec2fa84f0de7b04f5155ddeff400be3952cb5cb"],
             "eth_getFilterLogs":[],
             "eth_getLogs":[],
             "eth_getProof":[],
@@ -291,6 +291,22 @@
 
     }
 
+    function setupTestData(){
+        var request = new window.setup.web3.BatchRequest()
+        /*request.add(window.setup.web3.eth.filter({})
+            method: "eth_newFilter",
+            params: [{}],
+            jsonrpc: "2.0",
+            id: new Date().getTime()
+            },function(error,result){
+                    var id = result.result
+                    window.setup.tests["eth_getFilterChanges"] = [{quantity: result}]
+             }))*/
+        
+        request.execute();
+        window.setup.setupDone = true
+    }
+
     function test(){
         if ( !setupConnections() ){
             //add entered values back to the fields
@@ -300,12 +316,26 @@
             //return
         }
 
-        statusAndLog("starting tests")
+        window.setup.setupDone = false
+        setupTestData()
 
-        window.setup.testFailed = false
-        window.setup.testRunning = false
+        wait({
+            code: () => {
+                statusAndLog("starting tests")
 
-        mainLoop(0)
+                window.setup.testFailed = false
+                window.setup.testRunning = false
+
+                mainLoop(0)
+            },
+
+            ms: 5000,
+            check: () => {return window.setup.setupDone == true },
+            message:"main"
+        })
+
+
+        
         
     }
 
