@@ -16,6 +16,11 @@
         }
         window.setup = {}
 
+        window.setup.differentResults = [
+            "eth_blockNumber",
+            "eth_gasPrice"
+        ]
+
         window.setup.errorTests = {
             "eth_call":[],
         }
@@ -27,6 +32,7 @@
             "eth_getEncryptionPublicKey":[],
         }
 
+       
 
         //key - rpc method
         //value - parameters
@@ -177,7 +183,7 @@
                     if (result["result"]){
                         window.setup.web3Result = result["result"]
                     }else{
-                        window.setup.web3Result = result["error"].code
+                        window.setup.web3Result = result["error"]
                     }
                     addToLog("web3 result:" + JSON.stringify(result))
                     statusAndLog("web3 success")
@@ -201,7 +207,7 @@
                 addToLog("ethereum error:" + JSON.stringify(error))
                 statusAndLog("ethereum error")
                 window.setup.ethereumRunning = false
-                window.setup.ethereumResult = error.code
+                window.setup.ethereumResult = error
             }
         )
     }
@@ -219,6 +225,47 @@
         ,ms)
     }
 
+    function compareResults(func){
+        //check for error
+        if (window.setup.ethereumResult.code == window.setup.web3Result.code ){
+            statusAndLog("results are the same")
+            addToLog("")
+            return
+        }
+
+        //handle cases where results can be a bit off like block number and gas price
+        if (window.setup.differentResults.includes(func)){
+            var web3Data = window.setup.web3.utils.hexToNumber(window.setup.web3Result)
+            var ethereumData = window.setup.web3.utils.hexToNumber(window.setup.ethereumResult)
+            if (web3Data < ethereumData){
+                //10% offset
+                if (web3Data > ethereumData * 0.9){
+                    statusAndLog("results within bounds")
+                    addToLog("")
+                    return
+                }
+            }else{
+                //10% offset
+                if (web3Data * 0.9 < ethereumData){
+                    statusAndLog("results within bounds")
+                    addToLog("")
+                    return
+                }
+            }
+
+        }
+
+        //all other cases
+        if ( window.setup.ethereumResult  == window.setup.web3Result){
+            statusAndLog("results are the same")
+            addToLog("")
+        }else{
+            statusAndLog("results are the not the same")
+            window.setup.testFailed = true
+        }
+                        
+    }
+
     function runTest(func,params){
         window.setup.web3Running = true
         runWeb3(func,params)
@@ -229,19 +276,13 @@
                 runEthereum(func, params)
                 wait({
                     code: () => {
-                        if ( window.setup.ethereumResult  == window.setup.web3Result){
-                        statusAndLog("results are the same")
-                        addToLog("")
-                    }else{
-                        statusAndLog("results are the not the same")
-                        window.setup.testFailed = true
-                    }
-                    window.setup.testRunning = false
-                },
-                ms: 1000,
-                check: () => {return window.setup.ethereumRunning == false },
-                message: `${func} on ethereum`
-            })
+                        compareResults(func)
+                        window.setup.testRunning = false
+                    },
+                    ms: 1000,
+                    check: () => {return window.setup.ethereumRunning == false },
+                    message: `${func} on ethereum`
+                })
             },
             ms: 1000,
             check: () => {return window.setup.web3Running == false },
