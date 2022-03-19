@@ -34,7 +34,7 @@
                          data: "0xd1bbd49c"},
                         "latest"],
             "eth_chainId":[],
-            "eth_compileLLL":[],
+            "eth_compile":[],
             "eth_compileSerpent":[],
             "eth_compileSolidity":[],
             "eth_decrypt":[],
@@ -177,7 +177,7 @@
                     if (result["result"]){
                         window.setup.web3Result = result["result"]
                     }else{
-                        window.setup.web3Result = result["error"]
+                        window.setup.web3Result = result["error"].code
                     }
                     addToLog("web3 result:" + JSON.stringify(result))
                     statusAndLog("web3 success")
@@ -201,7 +201,7 @@
                 addToLog("ethereum error:" + JSON.stringify(error))
                 statusAndLog("ethereum error")
                 window.setup.ethereumRunning = false
-                window.setup.ethereumResult = error
+                window.setup.ethereumResult = error.code
             }
         )
     }
