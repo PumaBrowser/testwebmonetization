@@ -14,18 +14,24 @@
         function sleep(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
         }
-        window.setup = {}
+        window.APITests = {}
 
-        window.setup.differentResults = [
+        window.APITests.differentResults = [
             "eth_blockNumber",
             "eth_gasPrice"
         ]
 
-        window.setup.errorTests = {
+        window.APITests.checkForSuccessOnly = [
+            "eth_newBlockFilter",
+            "eth_newFilter",
+            "eth_newPendingTransactionFilter",
+        ]
+
+        window.APITests.errorTests = {
             "eth_call":[],
         }
 
-        window.setup.onlyEthereumTests = {
+        window.APITests.onlyEthereumTests = {
             "eth_accounts":[],
             "eth_coinbase":[],
             "eth_decrypt":[],
@@ -36,7 +42,7 @@
 
         //key - rpc method
         //value - parameters
-        window.setup.tests = {
+        window.APITests.tests = {
            /* "eth_blockNumber":[],
             "eth_call":[{to: "0xccf20531fe0d10740e9de0f11cc57d91f833e6de",
                          data: "0xd1bbd49c"},
@@ -132,10 +138,10 @@
 
     function setupConnections(){
         //check inputs
-        window.setup.address = document.getElementById("node").value
-        window.setup.pk = document.getElementById("pk").value
+        window.APITests.address = document.getElementById("node").value
+        window.APITests.pk = document.getElementById("pk").value
 
-        if( window.setup.address == "" || window.setup.pk == "" ){
+        if( window.APITests.address == "" || window.APITests.pk == "" ){
             document.getElementById("inputs").innerHTML = 
                 "<p> Please enter node address and primary key of the test account</p>" +
                 document.getElementById("inputs").innerHTML
@@ -150,8 +156,8 @@
         }
 
         if ( window.Web3 ){
-            statusAndLog(`web3 setup with "${window.setup.address}"`)
-            window.setup.web3 = new window.Web3(window.setup.address);
+            statusAndLog(`web3 setup with "${window.APITests.address}"`)
+            window.APITests.web3 = new window.Web3(window.APITests.address);
         }else{
             document.getElementById("inputs").innerHTML = 
                 "<p> Web 3 is not loaded, give it a moment </p>" +
@@ -167,9 +173,9 @@
 
     function runWeb3(func,params){
         statusAndLog(`running ${func} with ${JSON.stringify(params)} on web3`)
-        window.setup.web3Result = ""
-        window.setup.ethereumResult = ""
-        window.setup.web3.currentProvider.send({
+        window.APITests.web3Result = ""
+        window.APITests.ethereumResult = ""
+        window.APITests.web3.currentProvider.send({
             method: func,
             params: params,
             jsonrpc: "2.0",
@@ -179,17 +185,19 @@
                 if( error ){
                     addToLog("web3 error:" + JSON.stringify(error))
                     statusAndLog("web3 error")
-                    window.setup.web3Result = error["error"]
+                    window.APITests.web3Result = error["error"]
+                    window.APITests.web3Success = false
                 }else {
                     if (typeof result["result"] !== 'undefined'){
-                        window.setup.web3Result = result["result"]
+                        window.APITests.web3Result = result["result"]
                     }else{
-                        window.setup.web3Result = result["error"]
+                        window.APITests.web3Result = result["error"]
                     }
                     addToLog("web3 result:" + JSON.stringify(result))
                     statusAndLog("web3 success")
+                    window.APITests.web3Success = true
                 }
-                window.setup.web3Running = false
+                window.APITests.web3Running = false
                 
             }
         )
@@ -201,14 +209,16 @@
             function (result){
                 addToLog("ethereum result:" + JSON.stringify(result))
                 statusAndLog("ethereum success")
-                window.setup.ethereumResult = result
-                window.setup.ethereumRunning = false
+                window.APITests.ethereumResult = result
+                window.APITests.ethereumRunning = false
+                window.APITests.ethereumSuccess = true
             },
             function (error){
                 addToLog("ethereum error:" + JSON.stringify(error))
                 statusAndLog("ethereum error")
-                window.setup.ethereumRunning = false
-                window.setup.ethereumResult = error
+                window.APITests.ethereumRunning = false
+                window.APITests.ethereumResult = error
+                window.APITests.ethereumSuccess = false
             }
         )
     }
@@ -228,8 +238,12 @@
 
     function compareResults(func){
         //check for error
-        if (window.setup.ethereumResult && window.setup.web3Result ){
-            if (window.setup.ethereumResult.code == window.setup.web3Result.code ){
+        if (typeof window.APITests.ethereumResult !== "undefined"  && 
+            typeof window.APITests.web3Result !== "undefined" && 
+            typeof window.APITests.ethereumResult.code !== "undefined" && 
+            typeof window.APITests.web3Result.code !== "undefined" 
+            ){
+            if (window.APITests.ethereumResult.code == window.APITests.web3Result.code){  
                 statusAndLog("results are the same")
                 addToLog("")
                 return
@@ -237,9 +251,9 @@
         }
 
         //handle cases where results can be a bit off like block number and gas price
-        if (window.setup.differentResults.includes(func)){
-            var web3Data = window.setup.web3.utils.hexToNumber(window.setup.web3Result)
-            var ethereumData = window.setup.web3.utils.hexToNumber(window.setup.ethereumResult)
+        if (window.APITests.differentResults.includes(func)){
+            var web3Data = window.APITests.web3.utils.hexToNumber(window.APITests.web3Result)
+            var ethereumData = window.APITests.web3.utils.hexToNumber(window.APITests.ethereumResult)
             if (web3Data < ethereumData){
                 //10% offset
                 if (web3Data > ethereumData * 0.9){
@@ -258,82 +272,90 @@
 
         }
 
+        if (window.APITests.checkForSuccessOnly.includes(func)){
+            if (window.APITests.ethereumSuccess == window.APITests.web3Success){
+                statusAndLog("results within bounds")
+                addToLog("")
+                return
+            }
+        }
+
         //all other cases
-        if ( window.setup.ethereumResult  == window.setup.web3Result){
+        if ( window.APITests.ethereumResult  == window.APITests.web3Result){
             statusAndLog("results are the same")
             addToLog("")
         }else{
             statusAndLog("results are the not the same")
-            window.setup.testFailed = true
+            window.APITests.testFailed = true
         }
                         
     }
 
     function runTest(func,params){
-        window.setup.web3Running = true
+        window.APITests.web3Running = true
         runWeb3(func,params)
 
         wait({
             code: () => {
-                window.setup.ethereumRunning = true
+                window.APITests.ethereumRunning = true
                 runEthereum(func, params)
                 wait({
                     code: () => {
                         compareResults(func)
-                        window.setup.testRunning = false
+                        window.APITests.testRunning = false
                     },
                     ms: 1000,
-                    check: () => {return window.setup.ethereumRunning == false },
+                    check: () => {return window.APITests.ethereumRunning == false },
                     message: `${func} on ethereum`
                 })
             },
             ms: 1000,
-            check: () => {return window.setup.web3Running == false },
+            check: () => {return window.APITests.web3Running == false },
             message: `${func} on web 3`
         })
 
     }
 
     function setupTestData(){
-        var request = new window.setup.web3.BatchRequest()
-        /*request.add(window.setup.web3.eth.filter({})
+        var request = new window.APITests.web3.BatchRequest()
+        /*request.add(window.APITests.web3.eth.filter({})
             method: "eth_newFilter",
             params: [{}],
             jsonrpc: "2.0",
             id: new Date().getTime()
             },function(error,result){
                     var id = result.result
-                    window.setup.tests["eth_getFilterChanges"] = [{quantity: result}]
+                    window.APITests.tests["eth_getFilterChanges"] = [{quantity: result}]
              }))*/
         
         request.execute();
-        window.setup.setupDone = true
+        window.APITests.APITestsDone = true
     }
 
     function test(){
         if ( !setupConnections() ){
             //add entered values back to the fields
-            document.getElementById("node").value = window.setup.address
-            document.getElementById("pk").value = window.setup.pk
+            document.getElementById("node").value = window.APITests.address
+            document.getElementById("pk").value = window.APITests.pk
             updateStatus("setup failed")
             //return
         }
 
-        window.setup.setupDone = false
+        window.APITests.APITestsDone = false
         setupTestData()
 
         wait({
             code: () => {
                 statusAndLog("starting tests")
 
-                window.setup.testFailed = false
-                window.setup.testRunning = false
+                window.APITests.testFailed = false
+                window.APITests.testRunning = false
 
                 mainLoop(0)
             },
 
             ms: 5000,
-            check: () => {return window.setup.setupDone == true },
+            check: () => {return window.APITests.APITestsDone == true },
             message:"main"
         })
 
@@ -343,24 +365,24 @@
     }
 
     function mainLoop(count){
-        document.getElementById("testCount").innerHTML = `On test ${ (count + 1 )}/${Object.keys(window.setup.tests).length}`
+        document.getElementById("testCount").innerHTML = `On test ${ (count + 1 )}/${Object.keys(window.APITests.tests).length}`
         wait({
             code: () => {
-                if( count >= Object.keys(window.setup.tests).length ){
+                if( count >= Object.keys(window.APITests.tests).length ){
                     statusAndLog("done")
                     return
                 }
-                if(  window.setup.testFailed == true){
+                if(  window.APITests.testFailed == true){
                     return
                 }
-                var func = Object.keys(window.setup.tests).sort()[count]
-                var params = window.setup.tests[func]
-                window.setup.testRunning = true
+                var func = Object.keys(window.APITests.tests).sort()[count]
+                var params = window.APITests.tests[func]
+                window.APITests.testRunning = true
                 runTest(func,params)
                 mainLoop(count+1)
             },
             ms: 5000,
-            check: () => {return window.setup.testRunning == false },
+            check: () => {return window.APITests.testRunning == false },
             message:"main"
         })
     }
