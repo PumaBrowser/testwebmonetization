@@ -43,6 +43,7 @@
             "eth_coinbase":[],
             "eth_decrypt":[],
             "eth_getEncryptionPublicKey":[],
+            "eth_sign":[],
             "eth_signTransaction":[],
             "eth_signTypedData":[],
             "eth_signTypedData_v1":[],
@@ -95,7 +96,6 @@
             "eth_newFilter":[],
             "eth_newPendingTransactionFilter":[],
             "eth_protocolVersion":[],
-            "eth_sign":[],
             "eth_submitHashrate":[],
             "eth_submitWork":[],
             "eth_syncing":[],
@@ -249,7 +249,7 @@
             typeof window.APITests.web3Result.code !== "undefined" 
             ){
             if (window.APITests.ethereumResult.code == window.APITests.web3Result.code){  
-                statusAndLog("results are the same")
+                statusAndLog(func + ": results are the same")
                 addToLog("")
                 return
             }
@@ -262,14 +262,14 @@
             if (web3Data < ethereumData){
                 //10% offset
                 if (web3Data > ethereumData * 0.9){
-                    statusAndLog("results within bounds")
+                    statusAndLog(func + ": results within bounds")
                     addToLog("")
                     return
                 }
             }else{
                 //10% offset
                 if (web3Data * 0.9 < ethereumData){
-                    statusAndLog("results within bounds")
+                    statusAndLog(func + ": results within bounds")
                     addToLog("")
                     return
                 }
@@ -279,7 +279,7 @@
 
         if (window.APITests.checkForSuccessOnly.includes(func)){
             if (window.APITests.ethereumSuccess == window.APITests.web3Success){
-                statusAndLog("results are the same")
+                statusAndLog(func + ": results are the same")
                 addToLog("")
                 return
             }
@@ -287,10 +287,10 @@
 
         //all other cases
         if ( window.APITests.ethereumResult  == window.APITests.web3Result){
-            statusAndLog("results are the same")
+            statusAndLog(func + ": results are the same")
             addToLog("")
         }else{
-            statusAndLog("results are the not the same")
+            statusAndLog(func + ": results are the not the same")
             window.APITests.testFailed = true
         }
                         
