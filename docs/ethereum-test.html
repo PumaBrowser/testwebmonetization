@@ -49,6 +49,8 @@
             "eth_signTypedData_v1":[],
             "eth_signTypedData_v3":[],
             "eth_signTypedData_v4":[],
+            "metamask_getProviderState":[],
+            "metamask_watchAsset":[],
         }
 
        
@@ -99,9 +101,8 @@
             "eth_submitHashrate":[],
             "eth_submitWork":[],
             "eth_syncing":[],
-            "eth_uninstallFilter":[],
-            "metamask_getProviderState":[],
-            "metamask_watchAsset":[],
+            //metamask is not processing this in the same way as web3.
+            //"eth_uninstallFilter":[],
             "net_listening":[],
             "net_peerCount":[],
             "net_version":[],
@@ -115,6 +116,7 @@
             "shh_newGroup":[],
             "shh_newIdentity":[],
             "shh_post":[],
+            //metamask is not processing this in the same way as web3.
             "shh_uninstallFilter":[],
             "shh_version":[],
             "wallet_watchAsset":[],
@@ -322,19 +324,25 @@
     }
 
     function setupTestData(){
-        var request = new window.APITests.web3.BatchRequest()
-        /*request.add(window.APITests.web3.eth.filter({})
-            method: "eth_newFilter",
-            params: [{}],
-            jsonrpc: "2.0",
-            id: new Date().getTime()
-            },function(error,result){
-                    var id = result.result
-                    window.APITests.tests["eth_getFilterChanges"] = [{quantity: result}]
-             }))*/
+        /*var callCount = 1
+        window.ethereum.request(
+            {method :"eth_newFilter",
+             params: [{from:10351344, to: 10351344, address: "0x8888f1f195afa192cfee860698584c030f4c9db1" }]}).then(
+                function (result){
+                    callCount -= 1
+
+                },
+             )
+        wait({
+            code: () => {
+                window.APITests.setupDone = true
+            },
+            ms: 5000,
+            check: () => {return callCount == 0 },
+            message:"setting things up"
+        })*/
         
-        request.execute();
-        window.APITests.APITestsDone = true
+        window.APITests.setupDone = true
     }
 
     function test(){
@@ -346,7 +354,7 @@
             //return
         }
 
-        window.APITests.APITestsDone = false
+        window.APITests.setupDone = false
         setupTestData()
 
         wait({
@@ -360,7 +368,7 @@
             },
 
             ms: 5000,
-            check: () => {return window.APITests.APITestsDone == true },
+            check: () => {return window.APITests.setupDone == true },
             message:"main"
         })
 
