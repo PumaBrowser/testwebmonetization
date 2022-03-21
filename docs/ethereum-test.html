@@ -181,7 +181,7 @@
                     statusAndLog("web3 error")
                     window.setup.web3Result = error["error"]
                 }else {
-                    if (result["result"]){
+                    if (typeof result["result"] !== 'undefined'){
                         window.setup.web3Result = result["result"]
                     }else{
                         window.setup.web3Result = result["error"]
