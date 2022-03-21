@@ -228,10 +228,12 @@
 
     function compareResults(func){
         //check for error
-        if (window.setup.ethereumResult.code == window.setup.web3Result.code ){
-            statusAndLog("results are the same")
-            addToLog("")
-            return
+        if (window.setup.ethereumResult && window.setup.web3Result ){
+            if (window.setup.ethereumResult.code == window.setup.web3Result.code ){
+                statusAndLog("results are the same")
+                addToLog("")
+                return
+            }
         }
 
         //handle cases where results can be a bit off like block number and gas price
