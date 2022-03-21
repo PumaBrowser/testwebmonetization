@@ -37,7 +37,7 @@
         //key - rpc method
         //value - parameters
         window.setup.tests = {
-            "eth_blockNumber":[],
+           /* "eth_blockNumber":[],
             "eth_call":[{to: "0xccf20531fe0d10740e9de0f11cc57d91f833e6de",
                          data: "0xd1bbd49c"},
                         "latest"],
@@ -71,7 +71,7 @@
             "eth_getUncleCountByBlockHash":[],
             "eth_getUncleCountByBlockNumber":[],
             "eth_getWork":[],
-            "eth_hashrate":[],
+            "eth_hashrate":[],*/
             "eth_mining":[],
             "eth_newBlockFilter":[],
             "eth_newFilter":[],
@@ -341,7 +341,7 @@
     }
 
     function mainLoop(count){
-        document.getElementById("testCount").innerHTML = `${count}/${Object.keys(window.setup.tests).length}`
+        document.getElementById("testCount").innerHTML = `On test ${ (count + 1 )}/${Object.keys(window.setup.tests).length}`
         wait({
             code: () => {
                 if( count >= Object.keys(window.setup.tests).length ){
@@ -396,9 +396,7 @@
 </div>
 
 <div id="logging" style="display: none;">
-<p>
-    On test <div  id="testCount"> </div>
-</p>
+<div  id="testCount"> </div>
 <p>Current test status</p>
 <div id="status"></div>
 <br>
