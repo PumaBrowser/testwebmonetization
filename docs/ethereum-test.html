@@ -29,6 +29,12 @@
 
         window.APITests.errorTests = {
             "eth_call":[],
+            "eth_sendRawTransaction":[],
+        }
+
+        window.APITests.transactionTests = {
+            "eth_sendRawTransaction":[],
+            "eth_sendTransaction":[],
         }
 
         window.APITests.onlyEthereumTests = {
@@ -36,6 +42,11 @@
             "eth_coinbase":[],
             "eth_decrypt":[],
             "eth_getEncryptionPublicKey":[],
+            "eth_signTransaction":[],
+            "eth_signTypedData":[],
+            "eth_signTypedData_v1":[],
+            "eth_signTypedData_v3":[],
+            "eth_signTypedData_v4":[],
         }
 
        
@@ -43,7 +54,7 @@
         //key - rpc method
         //value - parameters
         window.APITests.tests = {
-           /* "eth_blockNumber":[],
+            "eth_blockNumber":[],
             "eth_call":[{to: "0xccf20531fe0d10740e9de0f11cc57d91f833e6de",
                          data: "0xd1bbd49c"},
                         "latest"],
@@ -77,20 +88,13 @@
             "eth_getUncleCountByBlockHash":[],
             "eth_getUncleCountByBlockNumber":[],
             "eth_getWork":[],
-            "eth_hashrate":[],*/
+            "eth_hashrate":[],
             "eth_mining":[],
             "eth_newBlockFilter":[],
             "eth_newFilter":[],
             "eth_newPendingTransactionFilter":[],
             "eth_protocolVersion":[],
-            "eth_sendRawTransaction":[],
-            "eth_sendTransaction":[],
             "eth_sign":[],
-            "eth_signTransaction":[],
-            "eth_signTypedData":[],
-            "eth_signTypedData_v1":[],
-            "eth_signTypedData_v3":[],
-            "eth_signTypedData_v4":[],
             "eth_submitHashrate":[],
             "eth_submitWork":[],
             "eth_syncing":[],
@@ -274,7 +278,7 @@
 
         if (window.APITests.checkForSuccessOnly.includes(func)){
             if (window.APITests.ethereumSuccess == window.APITests.web3Success){
-                statusAndLog("results within bounds")
+                statusAndLog("results are the same")
                 addToLog("")
                 return
             }
