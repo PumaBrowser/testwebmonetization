@@ -192,7 +192,7 @@
             window.APITests.tests.eth_getCode = [window.APITests.account.address,"latest"]
             //window.APITests.tests.eth_getProof = [window.APITests.account.address,["0x0000000000000000000000000000000000000000000000000000000000000000"],"latest"]
             window.APITests.tests.eth_getStorageAt = [window.APITests.account.address,"0x0", "latest"]
-            window.APITests.tests.eth_getTransactionCount = [window.APITests.account.address, "earliest"]
+            window.APITests.tests.eth_getTransactionCount = [window.APITests.account.address, "latest"]
         }else{
             document.getElementById("inputs").innerHTML = 
                 "<p> Web 3 is not loaded, give it a moment </p>" +
