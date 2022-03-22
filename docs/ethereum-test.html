@@ -51,6 +51,7 @@
             "eth_getUncleByBlockNumberAndIndex":[],
             "eth_getUncleCountByBlockHash":[],
             "eth_getUncleCountByBlockNumber":[],
+            "web3_sha":[]
         }
 
         //this are handeled differently my metamask
@@ -142,7 +143,7 @@
             "shh_uninstallFilter":[],
             "shh_version":[],
             "web3_clientVersion":[],
-            "web3_sha3":[]
+            "web3_sha3":["0x68656c6c6f20776f726c64"]
     }
 
     
@@ -413,7 +414,21 @@
                 window.APITests.testFailed = false
                 window.APITests.testRunning = false
 
-                mainLoop(0)
+                mainLoop(0,window.APITests.tests, "main batch")
+                wait({
+                    code: () => {
+                        statusAndLog("starting tests")
+
+                        window.APITests.testFailed = false
+                        window.APITests.testRunning = false
+                        
+                        window.APITests.testGroupDone = false
+                        mainLoop(0,window.APITests.errorTests,"errors testing")
+                    },
+                    ms: 5000,
+                    check: () => {return window.APITests.testGroupDone == true },
+                    message:"main"
+                })
             },
 
             ms: 5000,
@@ -426,22 +441,23 @@
         
     }
 
-    function mainLoop(count){
-        document.getElementById("testCount").innerHTML = `On test ${ (count + 1 )}/${Object.keys(window.APITests.tests).length}`
+    function mainLoop(count, tests, name){
+        document.getElementById("testCount").innerHTML = `On test ${ (count + 1 )}/${Object.keys(tests).length}`
         wait({
             code: () => {
-                if( count >= Object.keys(window.APITests.tests).length ){
-                    statusAndLog("done")
+                if( count >= Object.keys(tests).length ){
+                    window.APITests.testGroupDone = true
+                    statusAndLog("done " + name)
                     return
                 }
                 if(  window.APITests.testFailed == true){
                     return
                 }
-                var func = Object.keys(window.APITests.tests).sort()[count]
-                var params = window.APITests.tests[func]
+                var func = Object.keys(tests).sort()[count]
+                var params = tests[func]
                 window.APITests.testRunning = true
                 runTest(func,params)
-                mainLoop(count+1)
+                mainLoop(count+1,tests, name)
             },
             ms: 5000,
             check: () => {return window.APITests.testRunning == false },
