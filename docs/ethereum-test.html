@@ -25,13 +25,40 @@
             "eth_newBlockFilter",
             "eth_newFilter",
             "eth_newPendingTransactionFilter",
-            "eth_getLogs"
+            "eth_getLogs",
+            "web3_clientVersion"
         ]
 
+        //this methods need parameters, so should return 32602
         window.APITests.errorTests = {
-            "eth_call":[],
-            "eth_sendRawTransaction":[],
+            "eth_call":[], 
+            "eth_estimateGas":[],
+            "eth_feeHistory":[],
+            "eth_getBalance":[],
+            "eth_getBlockByHash":[],
+            "eth_getBlockByNumber":[],
+            "eth_getBlockTransactionCountByHash":[],
+            "eth_getBlockTransactionCountByNumber":[],
+            "eth_getCode":[],
+            "eth_getProof":[],
+            "eth_getStorageAt":[],
+            "eth_getTransactionByBlockHashAndIndex":[],
+            "eth_getTransactionByBlockNumberAndIndex":[],
+            "eth_getTransactionByHash":[],
+            "eth_getTransactionCount":[],
+            "eth_getTransactionReceipt":[],
+            "eth_getUncleByBlockHashAndIndex":[],
+            "eth_getUncleByBlockNumberAndIndex":[],
+            "eth_getUncleCountByBlockHash":[],
+            "eth_getUncleCountByBlockNumber":[],
         }
+
+        //this are handeled differently my metamask
+        window.APITests.filterTests = [
+            "eth_getFilterChanges",
+            "eth_getFilterLogs",
+            "eth_uninstallFilter"
+        ]
 
         window.APITests.transactionTests = {
             "eth_sendRawTransaction":[],
@@ -69,31 +96,28 @@
             "eth_compileLLL":[],
             "eth_compileSerpent":[],
             "eth_compileSolidity":[],
-            "eth_estimateGas":[],
-            "eth_feeHistory":[],
+            "eth_estimateGas":[{'maxPriorityFeePerGas': '0x9502f900','value': '0x5af3107a4000','from': '0x092c565e1360ba2bd37e6772102f15aa184567bd','data': '0x3f33133a00000000000000000000000000000000000000000000000000005af3107a4000000000000000000000000000092c565e1360ba2bd37e6772102f15aa184567bd000000000000000000000000092c565e1360ba2bd37e6772102f15aa184567bd00000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000000','maxFeePerGas': '0x9502f910','to': '0xccf20531fe0d10740e9de0f11cc57d91f833e6de'}],
+            "eth_feeHistory":["0x5", "earliest", []],
             "eth_gasPrice":[],
             "eth_getBalance":[],
-            "eth_getBlockByHash":[],
-            "eth_getBlockByNumber":[],
-            "eth_getBlockTransactionCountByHash":[],
-            "eth_getBlockTransactionCountByNumber":[],
-            "eth_getCode":[],
+            "eth_getBlockByHash":["0x4dcd3e18613ef8b05d78a40255b59eec308b8bf1b874fc3c1596ae0eadf8449a",false],
+            "eth_getBlockByNumber":["latest", false],
+            "eth_getBlockTransactionCountByHash":["0x4dcd3e18613ef8b05d78a40255b59eec308b8bf1b874fc3c1596ae0eadf8449a"],
+            "eth_getBlockTransactionCountByNumber":["latest"],
+            "eth_getCode":["","latest"],
             "eth_getCompilers":[],
-            //metamask is not processing this in the same way as web3.
-            //"eth_getFilterChanges":["0x10ff0ec2fa84f0de7b04f5155ddeff400be3952cb5cb"],
-            //"eth_getFilterLogs":["0x10ff0ec2fa84f0de7b04f5155ddeff400be3952cb5cb"],
             "eth_getLogs":[],
-            "eth_getProof":[],
+            "eth_getProof":[["",["0x0000000000000000000000000000000000000000000000000000000000000000"],"latest"]],
             "eth_getStorageAt":[],
-            "eth_getTransactionByBlockHashAndIndex":[],
-            "eth_getTransactionByBlockNumberAndIndex":[],
-            "eth_getTransactionByHash":[],
+            "eth_getTransactionByBlockHashAndIndex":["0x4dcd3e18613ef8b05d78a40255b59eec308b8bf1b874fc3c1596ae0eadf8449a","0x0"],
+            "eth_getTransactionByBlockNumberAndIndex":["latest","0x0"],
+            "eth_getTransactionByHash":["0x6551b486b338dc3796afcaa76c56a90a7e300b82d24630afe2daab42d1f9ab94"],
             "eth_getTransactionCount":[],
-            "eth_getTransactionReceipt":[],
-            "eth_getUncleByBlockHashAndIndex":[],
-            "eth_getUncleByBlockNumberAndIndex":[],
-            "eth_getUncleCountByBlockHash":[],
-            "eth_getUncleCountByBlockNumber":[],
+            "eth_getTransactionReceipt":["0x6551b486b338dc3796afcaa76c56a90a7e300b82d24630afe2daab42d1f9ab94"],
+            "eth_getUncleByBlockHashAndIndex":["0x4dcd3e18613ef8b05d78a40255b59eec308b8bf1b874fc3c1596ae0eadf8449a","0x0"],
+            "eth_getUncleByBlockNumberAndIndex":[ "latest","0x0"],
+            "eth_getUncleCountByBlockHash":["0x4dcd3e18613ef8b05d78a40255b59eec308b8bf1b874fc3c1596ae0eadf8449a"],
+            "eth_getUncleCountByBlockNumber":["latest"],
             "eth_getWork":[],
             "eth_hashrate":[],
             "eth_mining":[],
@@ -104,8 +128,6 @@
             "eth_submitHashrate":[],
             "eth_submitWork":[],
             "eth_syncing":[],
-            //metamask is not processing this in the same way as web3.
-            //"eth_uninstallFilter":[],
             "net_listening":[],
             "net_peerCount":[],
             "net_version":[],
@@ -144,7 +166,7 @@
 
     function setupConnections(){
         //check inputs
-        window.APITests.address = document.getElementById("node").value
+        window.APITests.node = document.getElementById("node").value
         window.APITests.pk = document.getElementById("pk").value
 
         if( window.APITests.address == "" || window.APITests.pk == "" ){
@@ -162,8 +184,14 @@
         }
 
         if ( window.Web3 ){
-            statusAndLog(`web3 setup with "${window.APITests.address}"`)
-            window.APITests.web3 = new window.Web3(window.APITests.address);
+            statusAndLog(`web3 setup with "${window.APITests.node}"`)
+            window.APITests.web3 = new window.Web3(window.APITests.node);
+            window.APITests.account = window.APITests.web3.eth.accounts.privateKeyToAccount(window.APITests.pk);
+            window.APITests.tests.eth_getBalance = [window.APITests.account.address]
+            window.APITests.tests.eth_getCode = [window.APITests.account.address,"latest"]
+            window.APITests.tests.eth_getProof = [window.APITests.account.address,["0x0000000000000000000000000000000000000000000000000000000000000000"],"latest"]
+            window.APITests.tests.eth_getStorageAt = [window.APITests.account.address,"0x0", "latest"]
+            window.APITests.tests.eth_getTransactionCount = [window.APITests.account.address, "latest"]
         }else{
             document.getElementById("inputs").innerHTML = 
                 "<p> Web 3 is not loaded, give it a moment </p>" +
@@ -246,13 +274,15 @@
         //check for error
         if (typeof window.APITests.ethereumResult !== "undefined"  && 
             typeof window.APITests.web3Result !== "undefined" && 
-            typeof window.APITests.ethereumResult.code !== "undefined" && 
-            typeof window.APITests.web3Result.code !== "undefined" 
-            ){
-            if (window.APITests.ethereumResult.code == window.APITests.web3Result.code){  
-                statusAndLog(func + ": results are the same")
-                addToLog("")
-                return
+            window.APITests.ethereumResult != null  && 
+            window.APITests.web3Result != null){
+            if (typeof window.APITests.ethereumResult.code !== "undefined" && 
+                typeof window.APITests.web3Result.code !== "undefined"){
+                if (window.APITests.ethereumResult.code == window.APITests.web3Result.code){  
+                    statusAndLog(func + ": results are the same")
+                    addToLog("")
+                    return
+                }
             }
         }
 
@@ -284,6 +314,26 @@
                 addToLog("")
                 return
             }
+        }
+
+        if (Array.isArray(window.APITests.web3Result) && Array.isArray(window.APITests.ethereumResult)){
+            var web3string = JSON.stringify( window.APITests.web3Result.sort)
+            var ethString = JSON.stringify(window.APITests.ethereumResult.sort)
+            if ( web3string == ethString){
+                statusAndLog(func + ": results are the same")
+            addToLog("")
+                return
+            }
+        }else if(typeof(window.APITests.ethereumResult) == "object" &&
+                 typeof(window.APITests.web3Result) == "object"){
+            var web3string = JSON.stringify(window.APITests.web3Result)
+            var ethString = JSON.stringify(window.APITests.ethereumResult)
+            if ( web3string == ethString){
+                statusAndLog(func + ": results are the same")
+                addToLog("")
+                return
+            }
+
         }
 
         //all other cases
