@@ -1,20 +1,25 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport"
+    <meta charset="UTF-8">
+    <meta name="viewport"
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Puma Ethereum API Test</title>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Puma Ethereum API Test</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="puma-eth-sig-util.js"></script>
 
-
-  <script>
+    <script>
         function sleep(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
         }
         window.APITests = {}
+
+        window.APITests.storeResults = {
+            "eth_chainID": "",
+            "personal_sign" : ""
+        }
 
         window.APITests.differentResults = [
             "eth_blockNumber",
@@ -66,23 +71,18 @@
             "eth_sendTransaction":[],
         }
 
-        window.APITests.onlyEthereumTests = {
-            "eth_accounts":[],
-            "eth_coinbase":[],
-            "eth_decrypt":[],
-            "eth_getEncryptionPublicKey":[],
-            "eth_sign":[],
-            "eth_signTransaction":[],
-            "eth_signTypedData":[],
-            "eth_signTypedData_v1":[],
-            "eth_signTypedData_v3":[],
-            "eth_signTypedData_v4":[],
-            "metamask_getProviderState":[],
-            "metamask_watchAsset":[],
-            "personal_ecRecover":[],
-            "personal_sign":[],
-            "wallet_watchAsset":[],
-        }
+        window.APITests.onlyEthereumTests = [
+            "eth_accounts",
+            "eth_coinbase",
+            "eth_decrypt",
+            "eth_getEncryptionPublicKey",
+            "eth_sign",
+            "eth_signTypedData_v3",
+            "eth_signTypedData_v4",
+            "metamask_getProviderState",
+            "personal_sign",
+            "personal_ecRecover"
+        ]
 
        
 
@@ -108,7 +108,7 @@
             "eth_getCode":["","latest"],
             "eth_getCompilers":[],
             "eth_getLogs":[],
-            "eth_getProof":[["0x54705167f67a4960200b2fb8d99ae576d83e8b22",["0x0000000000000000000000000000000000000000000000000000000000000000"],"latest"]],
+            "eth_getProof":["0x54705167f67a4960200b2fb8d99ae576d83e8b22",["0x0000000000000000000000000000000000000000000000000000000000000000"],"latest"],
             "eth_getStorageAt":[],
             "eth_getTransactionByBlockHashAndIndex":["0x4dcd3e18613ef8b05d78a40255b59eec308b8bf1b874fc3c1596ae0eadf8449a","0x0"],
             "eth_getTransactionByBlockNumberAndIndex":["earliest","0x0"],
@@ -188,7 +188,7 @@
             statusAndLog(`web3 setup with "${window.APITests.node}"`)
             window.APITests.web3 = new window.Web3(window.APITests.node);
             window.APITests.account = window.APITests.web3.eth.accounts.privateKeyToAccount(window.APITests.pk);
-            window.APITests.tests.eth_getBalance = [window.APITests.account.address]
+            window.APITests.tests.eth_getBalance = [window.APITests.account.address, "latest"]
             window.APITests.tests.eth_getCode = [window.APITests.account.address,"latest"]
             //window.APITests.tests.eth_getProof = [window.APITests.account.address,["0x0000000000000000000000000000000000000000000000000000000000000000"],"latest"]
             window.APITests.tests.eth_getStorageAt = [window.APITests.account.address,"0x0", "latest"]
@@ -287,6 +287,10 @@
             }
         }
 
+        if (Object.keys(window.APITests.storeResults).includes(func)){
+            window.APITests.storeResults[func] = window.APITests.ethereumResult
+        }
+
         //handle cases where results can be a bit off like block number and gas price
         if (window.APITests.differentResults.includes(func)){
             var web3Data = window.APITests.web3.utils.hexToNumber(window.APITests.web3Result)
@@ -316,6 +320,7 @@
                 return
             }
         }
+
 
         if (Array.isArray(window.APITests.web3Result) && Array.isArray(window.APITests.ethereumResult)){
             var web3string = JSON.stringify( window.APITests.web3Result.sort)
@@ -435,14 +440,9 @@
             check: () => {return window.APITests.setupDone == true },
             message:"main"
         })
-
-
-        
-        
     }
 
     function mainLoop(count, tests, name){
-        document.getElementById("testCount").innerHTML = `On test ${ (count + 1 )}/${Object.keys(tests).length}`
         wait({
             code: () => {
                 if( count >= Object.keys(tests).length ){
@@ -453,6 +453,7 @@
                 if(  window.APITests.testFailed == true){
                     return
                 }
+                document.getElementById("testCount").innerHTML = `On test ${ (count + 1 )}/${Object.keys(tests).length}`
                 var func = Object.keys(tests).sort()[count]
                 var params = tests[func]
                 window.APITests.testRunning = true
@@ -463,6 +464,97 @@
             check: () => {return window.APITests.testRunning == false },
             message:"main"
         })
+    }
+
+    function runEthereumOnlyTests(count){
+        var func = window.APITests.onlyEthereumTests[count]
+
+        var params = [];
+        switch(func) {
+            case "eth_sign":
+                params = [window.APITests.account.address, window.APITests.web3.utils.toHex("Hello World from Puma wallet API")]
+                break;
+            case "eth_signTypedData_v3", "eth_signTypedData_v4":
+                params = [window.APITests.account.address,
+                    JSON.stringify({types: {
+                    EIP712Domain: [
+                        { name: 'name', type: 'string' },
+                        { name: 'version', type: 'string' },
+                        { name: 'chainId', type: 'uint256' },
+                        { name: 'verifyingContract', type: 'address' },
+                        { name: 'salt', type: 'bytes32' },
+                    ],
+                    testData: [{name: 'testString', type: 'string'}],
+                    },
+                    domain: {
+                    name: 'Puma Test',
+                    version: '1',
+                    chainId: window.APITests.storeResults["eth_chainId"],
+                    verifyingContract: window.APITests.account.address,
+                    salt: "0x43efba6b4ccb1b6faa2625fe562bdd9a23260359"
+                    },
+                    primaryType: 'testData',
+                    message: {testString: "Hello World"}
+                })]
+                break;
+            case "personal_ecRecover":
+                params = ["0x4920616d207369676e696e6720746865206d6574616461746120666f7220746865206c6f636b20617420307863636632303533316665304431303734306539646530663131434335374439314638333365366445",
+                window.APITests.storeResults["personal_sign"]
+                ]
+                break;  
+            case "personal_sign":
+                params = [
+                    window.APITests.account.address,
+                    "0x4920616d207369676e696e6720746865206d6574616461746120666f7220746865206c6f636b20617420307863636632303533316665304431303734306539646530663131434335374439314638333365366445"
+                ]
+                break;  
+        
+        }
+
+        window.APITests.ethereumRunning = true
+        runEthereum(func, params)
+        wait({
+            code: () => {
+                checkEthereumResults(func)
+            },
+            ms: 1000,
+            check: () => {return window.APITests.ethereumRunning == false },
+            message: `${func} on ethereum`
+        })
+
+
+    }
+    /*
+            "eth_accounts",
+            "eth_coinbase",
+            "eth_decrypt",
+            "eth_getEncryptionPublicKey",
+            "eth_sign",
+            "eth_signTypedData_v3",
+            "eth_signTypedData_v4",
+            "metamask_getProviderState",
+            "personal_sign",
+            "personal_ecRecover"
+    */
+
+    function checkEthereumResults(func){
+        switch(func) {
+            case "eth_sign":
+                var privateKey = document.ethSigUtil.toBuffer(window.APITests.pk)
+                var signature = document.ethSigUtil.personalSign({privateKey, data})
+
+                break;
+            case "eth_signTypedData_v3", "eth_signTypedData_v4":
+                
+                break;
+            case "personal_ecRecover":
+
+                break;
+            case "personal_sign":
+                
+                break;  
+        
+        }
     }
 
 
@@ -490,8 +582,10 @@
 <body>
 
 <div id="inputs">
+    
     <p>It is advised to use test network and test account as some transactions use up gas</p>
     <p>Node address: <input type="text" id="node" size="90%"/> </p>
+    <p>For tests to work, make sure you are logged into wallet with the same PK</p>
     <p>PK to use: <input type="text" id="pk" size="90%"/> </p>
     <p><input type="button" value="start tests" onclick="test()"/></p>
 
