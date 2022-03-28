@@ -17,7 +17,7 @@
         window.APITests = {}
 
         window.APITests.storeResults = {
-            "eth_chainID": "",
+            "eth_chainId": "",
             "personal_sign" : ""
         }
 
@@ -74,8 +74,6 @@
         window.APITests.onlyEthereumTests = [
             "eth_accounts",
             "eth_coinbase",
-            "eth_decrypt",
-            "eth_getEncryptionPublicKey",
             "eth_sign",
             "eth_signTypedData_v3",
             "eth_signTypedData_v4",
@@ -259,6 +257,10 @@
     }
 
     function wait({code,ms,check,message= "", count = 0}){
+        if (window.APITests.testFailed == true){
+            //in case there is a failed test, we should stop all waiting
+            return
+        }
         setTimeout(() => {
             if(!check()){
                 statusAndLog(`waiting (${message}), count is ${count}` )
@@ -378,28 +380,6 @@
 
     }
 
-    function setupTestData(){
-        /*var callCount = 1
-        window.ethereum.request(
-            {method :"eth_newFilter",
-             params: [{from:10351344, to: 10351344, address: "0x8888f1f195afa192cfee860698584c030f4c9db1" }]}).then(
-                function (result){
-                    callCount -= 1
-
-                },
-             )
-        wait({
-            code: () => {
-                window.APITests.setupDone = true
-            },
-            ms: 5000,
-            check: () => {return callCount == 0 },
-            message:"setting things up"
-        })*/
-        
-        window.APITests.setupDone = true
-    }
-
     function test(){
         if ( !setupConnections() ){
             //add entered values back to the fields
@@ -409,37 +389,42 @@
             //return
         }
 
-        window.APITests.setupDone = false
-        setupTestData()
+        statusAndLog("starting first round of tests")
 
+        window.APITests.testFailed = false
+        window.APITests.testRunning = false
+
+        mainLoop(0,window.APITests.tests, "main batch")
         wait({
             code: () => {
-                statusAndLog("starting tests")
+                statusAndLog("starting second round of tests")
 
                 window.APITests.testFailed = false
                 window.APITests.testRunning = false
-
-                mainLoop(0,window.APITests.tests, "main batch")
+                
+                window.APITests.testGroupDone = false
+                mainLoop(0,window.APITests.errorTests,"errors testing")
                 wait({
                     code: () => {
-                        statusAndLog("starting tests")
+                        statusAndLog("starting third round of tests")
 
                         window.APITests.testFailed = false
                         window.APITests.testRunning = false
                         
                         window.APITests.testGroupDone = false
-                        mainLoop(0,window.APITests.errorTests,"errors testing")
+                        ethereumOnlyLoop(0)
+                        
                     },
                     ms: 5000,
                     check: () => {return window.APITests.testGroupDone == true },
                     message:"main"
                 })
             },
-
             ms: 5000,
-            check: () => {return window.APITests.setupDone == true },
+            check: () => {return window.APITests.testGroupDone == true },
             message:"main"
         })
+        
     }
 
     function mainLoop(count, tests, name){
@@ -466,7 +451,30 @@
         })
     }
 
-    function runEthereumOnlyTests(count){
+    function ethereumOnlyLoop(count){
+        wait({
+            code: () => {
+                if( count >= Object.keys(window.APITests.onlyEthereumTests).length ){
+                    window.APITests.testGroupDone = true
+                    statusAndLog("done ethereum only tests")
+                    return
+                }
+                if(  window.APITests.testFailed == true){
+                    return
+                }
+                document.getElementById("testCount").innerHTML = `On test ${ (count + 1 )}/${Object.keys(window.APITests.onlyEthereumTests).length}`
+                window.APITests.testRunning = true
+                runEthereumOnlyTest(count)
+                ethereumOnlyLoop(count+1)
+            },
+            ms: 1000,
+            check: () => {return window.APITests.testRunning == false },
+            message:"ethereum only tests"
+        })
+    }
+
+
+    function runEthereumOnlyTest(count){
         var func = window.APITests.onlyEthereumTests[count]
 
         var params = [];
@@ -524,37 +532,121 @@
 
 
     }
-    /*
-            "eth_accounts",
-            "eth_coinbase",
-            "eth_decrypt",
-            "eth_getEncryptionPublicKey",
-            "eth_sign",
-            "eth_signTypedData_v3",
-            "eth_signTypedData_v4",
-            "metamask_getProviderState",
-            "personal_sign",
-            "personal_ecRecover"
-    */
-
+    
     function checkEthereumResults(func){
+        var success = false
         switch(func) {
+            case "eth_accounts":
+                if (window.APITests.ethereumResult[0] == window.APITests.account.address){
+                    success = true
+                }
+                break
+            case "eth_coinbase":
+                //didn't find a way to test..... 
+                //so just make sure its a hex
+                if(window.APITests.web3.utils.isHex(window.APITests.ethereumResult)){
+                    success = true
+                }
+                break
             case "eth_sign":
-                var privateKey = document.ethSigUtil.toBuffer(window.APITests.pk)
-                var signature = document.ethSigUtil.personalSign({privateKey, data})
+                //didn't find a way to test..... 
+                //so just make sure its a hex
+                if(window.APITests.web3.utils.isHex(window.APITests.ethereumResult)){
+                    success = true
+                }
 
                 break;
-            case "eth_signTypedData_v3", "eth_signTypedData_v4":
+            case "eth_signTypedData_v3":
+                var privateKey = document.ethSigUtil.toBuffer(window.APITests.pk)
                 
+                var data = {types: {
+                    EIP712Domain: [
+                        { name: 'name', type: 'string' },
+                        { name: 'version', type: 'string' },
+                        { name: 'chainId', type: 'uint256' },
+                        { name: 'verifyingContract', type: 'address' },
+                        { name: 'salt', type: 'bytes32' },
+                    ],
+                    testData: [{name: 'testString', type: 'string'}],
+                    },
+                    domain: {
+                    name: 'Puma Test',
+                    version: '1',
+                    chainId: window.APITests.storeResults["eth_chainId"],
+                    verifyingContract: window.APITests.account.address,
+                    salt: "0x43efba6b4ccb1b6faa2625fe562bdd9a23260359"
+                    },
+                    primaryType: 'testData',
+                    message: {testString: "Hello World"}
+                }
+                var version = document.ethSigUtil.SignTypedDataVersion.V3
+                
+                var signature = document.ethSigUtil.signTypedData({privateKey, data,version})
+                if (window.APITests.ethereumResult == signature) {
+                    success = true
+                }
+                break;
+            case "eth_signTypedData_v4":
+                var privateKey = document.ethSigUtil.toBuffer(window.APITests.pk)
+                var data = {types: {
+                    EIP712Domain: [
+                        { name: 'name', type: 'string' },
+                        { name: 'version', type: 'string' },
+                        { name: 'chainId', type: 'uint256' },
+                        { name: 'verifyingContract', type: 'address' },
+                        { name: 'salt', type: 'bytes32' },
+                    ],
+                    testData: [{name: 'testString', type: 'string'}],
+                    },
+                    domain: {
+                    name: 'Puma Test',
+                    version: '1',
+                    chainId: window.APITests.storeResults["eth_chainId"],
+                    verifyingContract: window.APITests.account.address,
+                    salt: "0x43efba6b4ccb1b6faa2625fe562bdd9a23260359"
+                    },
+                    primaryType: 'testData',
+                    message: {testString: "Hello World"}
+                }
+                var version = document.ethSigUtil.SignTypedDataVersion.V4
+                
+                var signature = document.ethSigUtil.signTypedData({privateKey, data,version})
+                if (window.APITests.ethereumResult == signature) {
+                    success = true
+                }
                 break;
             case "personal_ecRecover":
-
+                if (window.APITests.ethereumResult == window.APITests.account.address){
+                    success = true
+                }
                 break;
             case "personal_sign":
-                
+                var privateKey = document.ethSigUtil.toBuffer(window.APITests.pk)
+                var data = window.APITests.web3.utils.toHex("Hello World from Puma wallet API")
+                var signature = document.ethSigUtil.personalSign({privateKey, data })
+                if (window.APITests.ethereumResult == signature) {
+                    success = true
+                    window.APITests.storeResults["personal_sign"] = signature
+                }
                 break;  
-        
+            case "metamask_getProviderState":
+                if ( typeof window.APITests.ethereumResult !== "undefined" ){
+                    if (typeof window.APITests.ethereumResult.accounts !== "undefined" ){
+                        if(window.APITests.ethereumResult.accounts[0] == window.APITests.account.address){
+                            success = true
+                        }                        
+                    }
+                }
+                break;
         }
+        if(success == true){
+            statusAndLog(func + ": test is successful")
+            addToLog("")
+        }else{
+            statusAndLog(func + ": test failed")
+            window.APITests.testFailed = true
+        }
+        window.APITests.testRunning = false
     }
 
 
