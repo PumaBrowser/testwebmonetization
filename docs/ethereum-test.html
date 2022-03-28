@@ -537,7 +537,7 @@
         var success = false
         switch(func) {
             case "eth_accounts":
-                if (window.APITests.ethereumResult[0] == window.APITests.account.address){
+                if (window.APITests.ethereumResult[0].toLowerCase == window.APITests.account.address.toLowerCase){
                     success = true
                 }
                 break
