@@ -641,7 +641,7 @@
                 break;
             case "personal_sign":
                 var privateKey = document.ethSigUtil.toBuffer(window.APITests.pk)
-                var data = window.APITests.web3.utils.toHex("Hello World from Puma wallet API")
+                var data = window.APITests.web3.utils.toHex("I am signing the metadata for the lock at 0xccf20531fe0D10740e9de0f11CC57D91F833e6dE")
                 var signature = document.ethSigUtil.personalSign({privateKey, data })
                 if (window.APITests.ethereumResult == signature) {
                     success = true
@@ -651,7 +651,7 @@
             case "metamask_getProviderState":
                 if ( typeof window.APITests.ethereumResult !== "undefined" ){
                     if (typeof window.APITests.ethereumResult.accounts !== "undefined" ){
-                        if(window.APITests.ethereumResult.accounts[0].toLowerCase() == window.APITests.account.address.toLowerCase()){
+                        if(window.APITests.ethereumResult.accounts[0].toLowerCase() == window.APITests.account.address){
                             success = true
                         }                        
                     }
