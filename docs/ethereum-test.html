@@ -651,7 +651,7 @@
             case "metamask_getProviderState":
                 if ( typeof window.APITests.ethereumResult !== "undefined" ){
                     if (typeof window.APITests.ethereumResult.accounts !== "undefined" ){
-                        if(window.APITests.ethereumResult.accounts[0].toLowerCase() == window.APITests.account.address){
+                        if(window.APITests.ethereumResult.accounts[0].toLowerCase() == window.APITests.account.address.toLowerCase()){
                             success = true
                         }                        
                     }
