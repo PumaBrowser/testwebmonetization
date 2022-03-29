@@ -635,7 +635,7 @@
                 }
                 break;
             case "personal_ecRecover":
-                if (window.APITests.ethereumResult == window.APITests.account.address){
+                if (window.APITests.ethereumResult.toLowerCase() == window.APITests.account.address.toLowerCase()){
                     success = true
                 }
                 break;
