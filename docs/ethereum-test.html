@@ -34,6 +34,10 @@
             "web3_clientVersion"
         ]
 
+        window.APITests.partialCompare = {
+            "eth_getProof": ["address","balance","codeHash","nonce","storageHash"]
+        }
+
         //this methods need parameters, so should return 32602
         window.APITests.errorTests = {
             "eth_call":[], 
@@ -323,6 +327,20 @@
             }
         }
 
+        //window.APITests.partialCompare
+        if ( Object.keys(window.APITests.partialCompare).includes(func)){
+            var failed = false
+            for ( let property in window.APITests.partialCompare[func] ){
+                if (window.APITests.ethereumSuccess[property] != window.APITests.web3Success[property]){
+                    failed = true
+                }
+            }
+            if (failed == false){
+                statusAndLog(func + ": results are the same")
+                addToLog("")
+                return
+            }
+        }
 
         if (Array.isArray(window.APITests.web3Result) && Array.isArray(window.APITests.ethereumResult)){
             var web3string = JSON.stringify( window.APITests.web3Result.sort)
@@ -538,7 +556,7 @@
         var success = false
         switch(func) {
             case "eth_accounts":
-                if (window.APITests.ethereumResult[0].toLowerCase == window.APITests.account.address.toLowerCase){
+                if (window.APITests.ethereumResult[0].toLowerCase() == window.APITests.account.address.toLowerCase()){
                     success = true
                 }
                 break
