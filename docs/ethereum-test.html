@@ -18,6 +18,7 @@
 
         window.APITests.storeResults = {
             "eth_chainId": "",
+            "eth_newFilter": "",
             "personal_sign" : ""
         }
 
@@ -124,7 +125,7 @@
             "eth_getWork":[],
             "eth_hashrate":[],
             "eth_mining":[],
-            "eth_newBlockFilter":[],
+            "eth_newBlockFilter":[{fromBlock: "latest",toBlock: "latest",address: window.APITests.account.address  }],
             "eth_newFilter":[],
             "eth_newPendingTransactionFilter":[],
             "eth_protocolVersion":[],
@@ -294,7 +295,7 @@
         }
 
         if (Object.keys(window.APITests.storeResults).includes(func)){
-            window.APITests.storeResults[func] = window.APITests.ethereumResult
+            window.APITests.storeResults[func] = [ window.APITests.web3Result, window.APITests.ethereumResult ]
         }
 
         //handle cases where results can be a bit off like block number and gas price
@@ -375,25 +376,19 @@
 
     function runTest(func,params){
         window.APITests.web3Running = true
+        window.APITests.ethereumRunning = true
         runWeb3(func,params)
+        runEthereum(func, params)
 
         wait({
             code: () => {
-                window.APITests.ethereumRunning = true
-                runEthereum(func, params)
-                wait({
-                    code: () => {
-                        compareResults(func)
-                        window.APITests.testRunning = false
-                    },
-                    ms: 1000,
-                    check: () => {return window.APITests.ethereumRunning == false },
-                    message: `${func} on ethereum`
-                })
+                
+                compareResults(func)
+                window.APITests.testRunning = false
             },
             ms: 1000,
-            check: () => {return window.APITests.web3Running == false },
-            message: `${func} on web 3`
+            check: () => {return window.APITests.web3Running == false && window.APITests.ethereumRunning == false },
+            message: `waiting for ${func}`
         })
 
     }
@@ -431,6 +426,22 @@
                         
                         window.APITests.testGroupDone = false
                         ethereumOnlyLoop(0)
+                        wait({
+                            code: () => {
+                                statusAndLog("starting fourth round of tests")
+
+                                window.APITests.testFailed = false
+                                window.APITests.testRunning = false
+                                
+                                window.APITests.testGroupDone = false
+                                filterLoop(0)
+                                
+                                
+                            },
+                            ms: 5000,
+                            check: () => {return window.APITests.testGroupDone == true },
+                            message:"main"
+                        })
                         
                     },
                     ms: 5000,
@@ -516,7 +527,7 @@
                     domain: {
                     name: 'Puma Test',
                     version: '1',
-                    chainId: window.APITests.storeResults["eth_chainId"],
+                    chainId: window.APITests.storeResults["eth_chainId"][0],
                     verifyingContract: window.APITests.account.address,
                     salt: "0x43efba6b4ccb1b6faa2625fe562bdd9a23260359"
                     },
@@ -591,7 +602,7 @@
                     domain: {
                     name: 'Puma Test',
                     version: '1',
-                    chainId: window.APITests.storeResults["eth_chainId"],
+                    chainId: window.APITests.storeResults["eth_chainId"][0],
                     verifyingContract: window.APITests.account.address,
                     salt: "0x43efba6b4ccb1b6faa2625fe562bdd9a23260359"
                     },
@@ -620,7 +631,7 @@
                     domain: {
                     name: 'Puma Test',
                     version: '1',
-                    chainId: window.APITests.storeResults["eth_chainId"],
+                    chainId: window.APITests.storeResults["eth_chainId"][0],
                     verifyingContract: window.APITests.account.address,
                     salt: "0x43efba6b4ccb1b6faa2625fe562bdd9a23260359"
                     },
@@ -668,6 +679,51 @@
         window.APITests.testRunning = false
     }
 
+    /*
+     window.APITests.filterTests = [
+            "eth_getFilterChanges",
+            "eth_getFilterLogs",
+            "eth_uninstallFilter"
+        ] */
+
+    function filterLoop(count){
+        document.getElementById("testCount").innerHTML = `On test ${ (count + 1 )}/${window.APITests.filterTests.length}`
+        var func = window.APITests.filterTests[count]
+        var web3params = [window.APITests.storeResults["eth_newFilter"][0]]
+        var ethereumParams = [window.APITests.storeResults["eth_newFilter"][1]]
+        window.APITests.testRunning = true
+        window.APITests.web3Running = true
+        window.APITests.ethereumRunning = true
+        runWeb3(func,web3params)
+        runEthereum(func, ethereumParams)
+        
+        wait({
+            code: () => {
+                compareResults(func)
+                window.APITests.testRunning = false
+
+                if( count >= window.APITests.filterTests.length ){
+                    window.APITests.testGroupDone = true
+                    statusAndLog("done filter tests")
+                    return
+                }
+                if(  window.APITests.testFailed == true){
+                    return
+                }
+                filterLoop(count + 1)
+            },
+            ms: 5000,
+            check: () => {return window.APITests.web3Running == false && window.APITests.ethereumRunning == false},
+            message:"filter loop"
+        })
+    }
+
+
+    /*    window.APITests.transactionTests = {
+            "eth_sendRawTransaction":[],
+            "eth_sendTransaction":[],
+        }
+    */
 
   </script>
 
