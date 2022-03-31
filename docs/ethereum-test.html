@@ -297,7 +297,7 @@
 
         if (Object.keys(window.APITests.storeResults).includes(func)){
             window.APITests.storeResults[func] = [ window.APITests.web3Result, window.APITests.ethereumResult ]
-            if (funk == "eth_blockNumber" ){
+            if (func == "eth_blockNumber" ){
                 window.APITests.tests.eth_newFilter.fromBlock = window.APITests.web3Result
                 window.APITests.tests.eth_newFilter.toBlock = window.APITests.web3Result
             }
@@ -430,7 +430,8 @@
                         window.APITests.testRunning = false
                         
                         window.APITests.testGroupDone = false
-                        ethereumOnlyLoop(0)
+                        filterLoop(0)
+                        
                         wait({
                             code: () => {
                                 statusAndLog("starting fourth round of tests")
@@ -439,8 +440,7 @@
                                 window.APITests.testRunning = false
                                 
                                 window.APITests.testGroupDone = false
-                                filterLoop(0)
-                                
+                                ethereumOnlyLoop(0)
                                 
                             },
                             ms: 5000,
