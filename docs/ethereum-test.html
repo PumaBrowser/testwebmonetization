@@ -17,6 +17,7 @@
         window.APITests = {}
 
         window.APITests.storeResults = {
+            "eth_blockNumber": "",
             "eth_chainId": "",
             "eth_newFilter": "",
             "personal_sign" : ""
@@ -296,6 +297,10 @@
 
         if (Object.keys(window.APITests.storeResults).includes(func)){
             window.APITests.storeResults[func] = [ window.APITests.web3Result, window.APITests.ethereumResult ]
+            if (funk == "eth_blockNumber" ){
+                window.APITests.tests.eth_newFilter.fromBlock = window.APITests.web3Result
+                window.APITests.tests.eth_newFilter.toBlock = window.APITests.web3Result
+            }
         }
 
         //handle cases where results can be a bit off like block number and gas price
@@ -679,14 +684,16 @@
         window.APITests.testRunning = false
     }
 
-    /*
-     window.APITests.filterTests = [
-            "eth_getFilterChanges",
-            "eth_getFilterLogs",
-            "eth_uninstallFilter"
-        ] */
-
+ 
     function filterLoop(count){
+        if( count >= window.APITests.filterTests.length ){
+            window.APITests.testGroupDone = true
+            statusAndLog("done filter tests")
+            return
+        }
+        if(  window.APITests.testFailed == true){
+            return
+        }
         document.getElementById("testCount").innerHTML = `On test ${ (count + 1 )}/${window.APITests.filterTests.length}`
         var func = window.APITests.filterTests[count]
         var web3params = [window.APITests.storeResults["eth_newFilter"][0]]
@@ -701,15 +708,6 @@
             code: () => {
                 compareResults(func)
                 window.APITests.testRunning = false
-
-                if( count >= window.APITests.filterTests.length ){
-                    window.APITests.testGroupDone = true
-                    statusAndLog("done filter tests")
-                    return
-                }
-                if(  window.APITests.testFailed == true){
-                    return
-                }
                 filterLoop(count + 1)
             },
             ms: 5000,
