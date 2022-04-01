@@ -443,7 +443,21 @@
                                 
                                 window.APITests.testGroupDone = false
                                 ethereumOnlyLoop(0)
-                                
+                                wait({
+                                    code: () => {
+                                        statusAndLog("starting last round of tests")
+
+                                        window.APITests.testFailed = false
+                                        window.APITests.testRunning = false
+                                        
+                                        window.APITests.testGroupDone = false
+                                        
+                                        runTransactionTests()
+                                    },
+                                    ms: 5000,
+                                    check: () => {return window.APITests.testGroupDone == true },
+                                    message:"main"
+                                })
                             },
                             ms: 5000,
                             check: () => {return window.APITests.testGroupDone == true },
@@ -712,16 +726,17 @@
                 window.APITests.testRunning = false
                 filterLoop(count + 1)
             },
-            ms: 5000,
+            ms: 3000,
             check: () => {return window.APITests.web3Running == false && window.APITests.ethereumRunning == false},
             message:"filter loop"
         })
     }
 
-    function eth_sendRawTransaction(){
+    function runTransactionTests(){
         var tx = {
             from: window.APITests.account.address,
             to: window.APITests.targetAddress,
+            gas: 20000000,
             value: window.APITests.web3.utils.toWei("0.0001", "ether")
         };
         window.APITests.web3.eth.accounts.signTransaction(tx,window.APITests.pk).then(
@@ -729,6 +744,42 @@
                 runEthereum("eth_sendRawTransaction",[signedTransaction.rawTransaction])
             }
         )
+
+        wait({
+            code: () => {
+                if (  window.APITests.web3.utils.isHex(window.APITests.ethereumResult) ){
+                    //we got hash back, run next test
+                    statusAndLog("eth_sendRawTransaction success")
+                    window.APITests.ethereumRunning = true
+                    runEthereum("eth_sendTransaction",[{
+                            from: window.APITests.account.address,
+                            to: window.APITests.targetAddress,
+                            gas: "21000",
+                            value: window.APITests.web3.utils.toWei("0.0001", "ether")
+                        }])
+
+                        wait({
+                        code: () => {
+                            if (  window.APITests.web3.utils.isHex(window.APITests.ethereumResult) ){
+                                //we got hash back, run next test
+                                statusAndLog("eth_sendTransaction success")
+                            } else{
+                                statusAndLog("eth_sendTransaction failed")
+                            } 
+                        },
+                        ms: 1000,
+                        check: () => {window.APITests.ethereumRunning == false},
+                        message:"eth_sendRawTransaction"
+                    })    
+                }else{
+                    statusAndLog("eth_sendRawTransaction failed")
+                } 
+            },
+            ms: 1000,
+            check: () => {window.APITests.ethereumRunning == false},
+            message:"eth_sendRawTransaction"
+        })
+
 
     }
 
@@ -768,7 +819,7 @@
     <p>Node address: <input type="text" id="node" size="90%"/> </p>
     <p>For tests to work, make sure you are logged into wallet with the same PK</p>
     <p>PK to use: <input type="text" id="pk" size="90%"/> </p>
-    <p>Account to sent test transfer to (0.0001 Eth + gas)</p>
+    <p>Account to sent test transfers to (0.0001 Eth + gas two times)</p>
     <p>Target Account to use: <input type="text" id="target" size="90%"/> </p>
     <p><input type="button" value="start tests" onclick="test()"/></p>
     <p><input type="button" value="setup only" onclick="setupConnections()"/></p>
