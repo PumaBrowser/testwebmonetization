@@ -733,6 +733,7 @@
     }
 
     function runTransactionTests(){
+        window.APITests.ethereumRunning = true
         var tx = {
             from: window.APITests.account.address,
             to: window.APITests.targetAddress,
@@ -783,12 +784,6 @@
 
     }
 
-
-    /*    window.APITests.transactionTests = {
-            "eth_sendRawTransaction":[],
-            "eth_sendTransaction":[],
-        }
-    */
 
   </script>
 
