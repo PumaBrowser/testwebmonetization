@@ -173,10 +173,11 @@
         //check inputs
         window.APITests.node = document.getElementById("node").value
         window.APITests.pk = document.getElementById("pk").value
+        window.APITests.targetAddress = document.getElementById("target").value
 
-        if( window.APITests.address == "" || window.APITests.pk == "" ){
+        if( window.APITests.address == "" || window.APITests.pk == "" || window.APITests.targetAddress == "" ){
             document.getElementById("inputs").innerHTML = 
-                "<p> Please enter node address and primary key of the test account</p>" +
+                "<p> Please enter test data </p>" +
                 document.getElementById("inputs").innerHTML
                 return false
         }
@@ -403,6 +404,7 @@
             //add entered values back to the fields
             document.getElementById("node").value = window.APITests.address
             document.getElementById("pk").value = window.APITests.pk
+            document.getElementById("target").value = window.APITests.targetAddress
             updateStatus("setup failed")
             //return
         }
@@ -716,6 +718,20 @@
         })
     }
 
+    function eth_sendRawTransaction(){
+        var tx = {
+            from: window.APITests.account.address,
+            to: window.APITests.targetAddress,
+            value: window.APITests.web3.utils.toWei("0.0001", "ether")
+        };
+        window.APITests.web3.eth.accounts.signTransaction(tx,window.APITests.pk).then(
+            function(signedTransaction){
+                runEthereum("eth_sendRawTransaction",[signedTransaction.rawTransaction])
+            }
+        )
+
+    }
+
 
     /*    window.APITests.transactionTests = {
             "eth_sendRawTransaction":[],
@@ -752,7 +768,10 @@
     <p>Node address: <input type="text" id="node" size="90%"/> </p>
     <p>For tests to work, make sure you are logged into wallet with the same PK</p>
     <p>PK to use: <input type="text" id="pk" size="90%"/> </p>
+    <p>Account to sent test transfer to (0.0001 Eth + gas)</p>
+    <p>Target Account to use: <input type="text" id="target" size="90%"/> </p>
     <p><input type="button" value="start tests" onclick="test()"/></p>
+    <p><input type="button" value="setup only" onclick="setupConnections()"/></p>
 
 </div>
 
