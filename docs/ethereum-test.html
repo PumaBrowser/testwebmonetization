@@ -362,26 +362,28 @@
             }
         }else if(typeof(window.APITests.ethereumResult) == "object" &&
                  typeof(window.APITests.web3Result) == "object"){
-             var orderedWeb3 = Object.keys(window.APITests.web3Result).sort().reduce(
-                (obj, key) => { 
-                    obj[key] = window.APITests.web3Result[key]; 
-                    return obj;
-                }, 
-                {}
-            );
-            var orderedEthereum = Object.keys(window.APITests.ethereumResult).sort().reduce(
-                (obj, key) => { 
-                    obj[key] = window.APITests.ethereumResult[key]; 
-                    return obj;
-                }, 
-                {}
-            );
-            var web3string = JSON.stringify(orderedWeb3)
-            var ethString = JSON.stringify(orderedEthereum)
-            if ( web3string == ethString){
-                statusAndLog(func + ": results are the same")
-                addToLog("")
-                return
+            if(window.APITests.ethereumResult != null && window.APITests.web3Result != null){
+                var orderedWeb3 = Object.keys(window.APITests.web3Result).sort().reduce(
+                    (obj, key) => { 
+                        obj[key] = window.APITests.web3Result[key]; 
+                        return obj;
+                    }, 
+                    {}
+                );
+                var orderedEthereum = Object.keys(window.APITests.ethereumResult).sort().reduce(
+                    (obj, key) => { 
+                        obj[key] = window.APITests.ethereumResult[key]; 
+                        return obj;
+                    }, 
+                    {}
+                );
+                var web3string = JSON.stringify(orderedWeb3)
+                var ethString = JSON.stringify(orderedEthereum)
+                if ( web3string == ethString){
+                    statusAndLog(func + ": results are the same")
+                    addToLog("")
+                    return
+                }
             }
 
         }
