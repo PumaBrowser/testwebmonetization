@@ -306,24 +306,27 @@
 
         //handle cases where results can be a bit off like block number and gas price
         if (window.APITests.differentResults.includes(func)){
-            var web3Data = window.APITests.web3.utils.hexToNumber(window.APITests.web3Result)
-            var ethereumData = window.APITests.web3.utils.hexToNumber(window.APITests.ethereumResult)
-            if (web3Data < ethereumData){
-                //10% offset
-                if (web3Data > ethereumData * 0.9){
-                    statusAndLog(func + ": results within bounds")
-                    addToLog("")
-                    return
-                }
-            }else{
-                //10% offset
-                if (web3Data * 0.9 < ethereumData){
-                    statusAndLog(func + ": results within bounds")
-                    addToLog("")
-                    return
-                }
-            }
+            if(window.APITests.web3.utils.isHex(window.APITests.ethereumResult)
+                && window.APITests.web3.utils.isHex(window.APITests.web3Result)){
 
+                var web3Data = window.APITests.web3.utils.hexToNumber(window.APITests.web3Result)
+                var ethereumData = window.APITests.web3.utils.hexToNumber(window.APITests.ethereumResult)
+                if (web3Data < ethereumData){
+                    //10% offset
+                    if (web3Data > ethereumData * 0.9){
+                        statusAndLog(func + ": results within bounds")
+                        addToLog("")
+                        return
+                    }
+                }else{
+                    //10% offset
+                    if (web3Data * 0.9 < ethereumData){
+                        statusAndLog(func + ": results within bounds")
+                        addToLog("")
+                        return
+                    }
+                }
+            } 
         }
 
         if (window.APITests.checkForSuccessOnly.includes(func)){
