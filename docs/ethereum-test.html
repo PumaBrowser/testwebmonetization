@@ -607,8 +607,14 @@
         var success = false
         switch(func) {
             case "eth_accounts":
-                if (window.APITests.ethereumResult[0].toLowerCase() == window.APITests.account.address.toLowerCase()){
-                    success = true
+                if ( window.APITests.ethereumResult != null){
+                    if (window.APITests.ethereumResult[0].toLowerCase() == window.APITests.account.address.toLowerCase()){
+                        success = true
+                    }
+                }else{
+                    if (window.APITests.ethereumResult == window.APITests.account.address ){
+                        success = true
+                    }
                 }
                 break
             case "eth_coinbase":
