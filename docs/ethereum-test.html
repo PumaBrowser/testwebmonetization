@@ -363,20 +363,8 @@
         }else if(typeof(window.APITests.ethereumResult) == "object" &&
                  typeof(window.APITests.web3Result) == "object"){
             if(window.APITests.ethereumResult != null && window.APITests.web3Result != null){
-                var orderedWeb3 = Object.keys(window.APITests.web3Result).sort().reduce(
-                    (obj, key) => { 
-                        obj[key] = window.APITests.web3Result[key]; 
-                        return obj;
-                    }, 
-                    {}
-                );
-                var orderedEthereum = Object.keys(window.APITests.ethereumResult).sort().reduce(
-                    (obj, key) => { 
-                        obj[key] = window.APITests.ethereumResult[key]; 
-                        return obj;
-                    }, 
-                    {}
-                );
+                var orderedWeb3 = sortObject(window.APITests.web3Result)
+                var orderedEthereum = sortObject(window.APITests.ethereumResult)
                 var web3string = JSON.stringify(orderedWeb3)
                 var ethString = JSON.stringify(orderedEthereum)
                 if ( web3string == ethString){
@@ -398,6 +386,40 @@
         }
                         
     }
+
+    function sortObject(object){
+        if (object == null){
+            return null
+        }
+        var obj = {}
+        for (var key of Object.keys(object).sort()){
+            var line = object[key]
+            //console.log( "in the loop ")
+            if( Array.isArray( line )){
+                //console.log("is array")
+                var sorted = line.sort()
+                for (var i = 0; i< sorted.length; i++ ){
+                    var item = sorted[i]
+                    //console.log("sorted at i " + item)
+                    if ( typeof(item) == "object" && Array.isArray(item) == false ){
+                        //console.log(`sortObject(${item})`)
+                        sorted[i] = sortObject(item)
+                        //console.log(sorted[i])
+                    }
+                }
+                obj[key] = sorted
+            }else if (typeof(line) == "object" && Array.isArray(line) == false  ){
+                //console.log(`sortObject(${line})`)
+                obj[key] = sortObject(line)
+                //console.log(obj[key])
+            }else{
+                obj[key] = line
+            }
+        }  
+        return obj;
+    }
+
+    sortObject(window.APITests.web3Result)
 
     function runTest(func,params){
         window.APITests.web3Running = true
