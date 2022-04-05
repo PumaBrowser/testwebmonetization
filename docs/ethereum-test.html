@@ -79,7 +79,8 @@
 
         window.APITests.onlyEthereumTests = [
             "eth_accounts",
-            "eth_coinbase",
+            //not supported for now
+            //"eth_coinbase",
             "eth_sign",
             "eth_signTypedData_v3",
             "eth_signTypedData_v4",
@@ -418,8 +419,6 @@
         }  
         return obj;
     }
-
-    sortObject(window.APITests.web3Result)
 
     function runTest(func,params){
         window.APITests.web3Running = true
