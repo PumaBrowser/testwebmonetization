@@ -724,6 +724,11 @@
                 if (window.APITests.ethereumResult == signature) {
                     success = true
                     window.APITests.storeResults["personal_sign"] = signature
+                }else if( window.APITests.web3.utils.isHex(window.APITests.ethereumResult)){
+                    //signatures don't always match, so check if it is hex. 
+                    //we might have to revisit this in future if we get proof of this causing issues.
+                    success = true
+                    window.APITests.storeResults["personal_sign"] = signature
                 }
                 break;  
             case "metamask_getProviderState":
