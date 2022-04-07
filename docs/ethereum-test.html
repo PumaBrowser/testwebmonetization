@@ -808,7 +808,7 @@
                             from: window.APITests.account.address,
                             to: window.APITests.targetAddress,
                             gas: "21000",
-                            maxFeePerGas: window.APITests.storeResults.eth_gasPrice * 2,
+                            maxFeePerGas:  window.APITests.storeResults.eth_gasPrice[0] * 2,
                             value: window.APITests.web3.utils.toWei("0.0001", "ether")
                         }])
 
