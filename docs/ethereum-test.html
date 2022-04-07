@@ -19,6 +19,7 @@
         window.APITests.storeResults = {
             "eth_blockNumber": "",
             "eth_chainId": "",
+            "eth_gasPrice": "",
             "eth_newFilter": "",
             "personal_sign" : ""
         }
@@ -807,7 +808,8 @@
                             from: window.APITests.account.address,
                             to: window.APITests.targetAddress,
                             gas: "21000",
-                            value: window.APITests.web3.utils.toWei("0.0005", "ether")
+                            maxFeePerGas: window.APITests.storeResults.eth_gasPrice * 2,
+                            value: window.APITests.web3.utils.toWei("0.0001", "ether")
                         }])
 
                         wait({
