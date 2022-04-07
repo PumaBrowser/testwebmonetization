@@ -807,7 +807,7 @@
                             from: window.APITests.account.address,
                             to: window.APITests.targetAddress,
                             gas: "21000",
-                            value: window.APITests.web3.utils.toWei("0.0001", "ether")
+                            value: window.APITests.web3.utils.toWei("0.0005", "ether")
                         }])
 
                         wait({
@@ -819,7 +819,7 @@
                                 statusAndLog("eth_sendTransaction failed")
                             } 
                         },
-                        ms: 1000,
+                        ms: 10000,
                         check: () => {return window.APITests.ethereumRunning == false},
                         message:"eth_sendTransaction"
                     })    
