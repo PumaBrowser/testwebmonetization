@@ -866,9 +866,11 @@
     
     <p>It is advised to use test network and test account as some transactions use up gas</p>
     <p>Node address: <input type="text" id="node" size="90%"/> </p>
-    <p>For tests to work, make sure you are logged into wallet with the same PK</p>
+    <p>For tests to work, make sure you are logged into wallet with the same PK</br>
+       This account should have enough to cover test costs (0.0001 Eth + gas two times)</br>
+       If there is not enough balance to cover the above, last two tests will fail </p>
     <p>PK to use: <input type="text" id="pk" size="90%"/> </p>
-    <p>Account to sent test transfers to (0.0001 Eth + gas two times)</p>
+    <p>Account to sent test transfers to</p>
     <p>Target Account to use: <input type="text" id="target" size="90%"/> </p>
     <p><input type="button" value="start tests" onclick="test()"/></p>
     <p><input type="button" value="setup only" onclick="setupConnections()"/></p>
