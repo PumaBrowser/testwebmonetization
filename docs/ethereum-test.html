@@ -231,10 +231,10 @@
                     window.APITests.web3Result = error["error"]
                     window.APITests.web3Success = false
                 }else {
-                    if (typeof result["result"] !== 'undefined'){
-                        window.APITests.web3Result = result["result"]
-                    }else{
+                    if (typeof result["error"] !== 'undefined'){
                         window.APITests.web3Result = result["error"]
+                    }else{
+                        window.APITests.web3Result = result["result"]
                     }
                     addToLog("web3 result:" + JSON.stringify(result))
                     statusAndLog("web3 success")
