@@ -755,6 +755,11 @@
 
  
     function filterLoop(count){
+        if (typeof window.APITests.storeResults["eth_newFilter"][0] == "undefined" || window.APITests.storeResults["eth_newFilter"][0] == null){
+            window.APITests.testGroupDone = true
+            statusAndLog("done filter tests")
+            return
+        }
         if( count >= window.APITests.filterTests.length ){
             window.APITests.testGroupDone = true
             statusAndLog("done filter tests")
