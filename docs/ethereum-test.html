@@ -162,8 +162,7 @@
 
     function addToLog(message){
         var container = document.getElementById("log")
-        container.innerText = container.innerText + 
-            message + '\n';
+        container.innerText = message + '\n' + container.innerText;
     }
 
     function updateStatus(message){
@@ -231,10 +230,11 @@
                     window.APITests.web3Result = error["error"]
                     window.APITests.web3Success = false
                 }else {
+                    if (typeof result["result"] !== 'undefined'){
+                        window.APITests.web3Result = result["result"]
+                    }
                     if (typeof result["error"] !== 'undefined'){
                         window.APITests.web3Result = result["error"]
-                    }else{
-                        window.APITests.web3Result = result["result"]
                     }
                     addToLog("web3 result:" + JSON.stringify(result))
                     statusAndLog("web3 success")
@@ -756,7 +756,7 @@
  
     function filterLoop(count){
         //xDai acts strange on filters
-        if (window.APITests.storeResults.eth_chainId == window.APITests.web3.utils.toHex(100)){
+        if (window.APITests.storeResults.eth_chainId[0] == window.APITests.web3.utils.toHex(100)){
             window.APITests.testGroupDone = true
             statusAndLog("skipping filter tests")
             return
