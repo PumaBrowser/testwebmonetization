@@ -755,8 +755,13 @@
 
  
     function filterLoop(count){
-        //xDai acts strange on filters
+        //xDai && celo acts strange on filters
         if (window.APITests.storeResults.eth_chainId[0] == window.APITests.web3.utils.toHex(100)){
+            window.APITests.testGroupDone = true
+            statusAndLog("skipping filter tests")
+            return
+        }
+        if (window.APITests.storeResults.eth_chainId[0] == window.APITests.web3.utils.toHex(42220)){
             window.APITests.testGroupDone = true
             statusAndLog("skipping filter tests")
             return
