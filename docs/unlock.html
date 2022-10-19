@@ -99,8 +99,7 @@
 
       container.innerText = container.innerText + 
         "Event type:" + e.type + '\n' +
-        "Event details" + e.detail + '\n\n';
-        //"Event details" + JSON.stringify(e.detail, null, 2) + '\n\n';
+        "Event details" + JSON.stringify(e.detail, null, 2) + '\n\n';
     }
     
     function logString(container, s){
