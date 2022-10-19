@@ -54,6 +54,7 @@
     }
 
     function logEvent(event){
+      var container = document.getElementById("container")
       logTo(container, event)
 
       var locks = event.detail.locks
@@ -78,10 +79,9 @@
     }
 
     function logTo(container, e){
-      //var detail = e.detail
       container.innerText = container.innerText + 
         "Event type:" + JSON.stringify(e.type, null, 2) + '\n' +
-      //  "Event details" + JSON.stringify(detail, null, 2) + '\n\n';
+        "Event details" + JSON.stringify(e.detail, null, 2) + '\n\n';
       console.log(e);
     }
     
