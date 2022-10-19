@@ -55,11 +55,8 @@
 
     function logEvent(event){
       var container = document.getElementById("container")
-      if(container){
-        logTo(container, event)
-      }
+      logTo(container, event)
       
-
       console.log(event.detail)
       console.log(event.detail["locks"])
 
@@ -85,6 +82,8 @@
     }
 
     function logTo(container, e){
+      if (container == null){return}
+      
       console.log(e)
       container.innerText = container.innerText + 
         "Event type:" + e.type + '\n' +
@@ -93,6 +92,8 @@
     }
     
     function logString(container, s){
+      if (container == null){return}
+      
       container.innerText = container.innerText + 
         "String:" + s + '\n\n';
       console.log(s);
