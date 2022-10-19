@@ -60,9 +60,9 @@
       console.log(event.detail)
       console.log(event.detail["locks"])
 
-      var locks = event.detail.locks
+      var locks = event.detail["locks"]
 
-      if ( !locks ){
+      if ( typeof locks === 'undefined' ){
         locks = Object.keys(window.unlockProtocolConfig.locks)
       }
       
@@ -70,20 +70,26 @@
       	var container = document.getElementById(lock.substr(15) + "container")
         logTo(container, event)
         if (event.detail.state == "unlocked"){
-        	document.getElementById(lock.substr(15) + "locked").style.display = "none"
-          document.getElementById(lock.substr(15) + "unlocked").style.display = "block"
+          if(document.getElementById(lock.substr(15) + "locked") != null){
+        	  document.getElementById(lock.substr(15) + "locked").style.display = "none"
+          }
+          if(document.getElementById(lock.substr(15) + "unlocked") != null){
+            document.getElementById(lock.substr(15) + "unlocked").style.display = "block"
+          }
         }else{
-          document.getElementById(lock.substr(15) + "locked").style.display = "block"
-          document.getElementById(lock.substr(15) + "unlocked").style.display = "none"
+          if( document.getElementById(lock.substr(15) + "locked") != null){
+            document.getElementById(lock.substr(15) + "locked").style.display = "block"
+          }
+          if( document.getElementById(lock.substr(15) + "locked") != null){
+            document.getElementById(lock.substr(15) + "unlocked").style.display = "none"
+          }
         }
-        
-        
       })
     }
 
     function logTo(container, e){
       if (container == null){return}
-      
+
       console.log(e)
       container.innerText = container.innerText + 
         "Event type:" + e.type + '\n' +
