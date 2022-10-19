@@ -79,9 +79,11 @@
     }
 
     function logTo(container, e){
+      console.log(e)
       container.innerText = container.innerText + 
-        "Event type:" + JSON.stringify(e.type, null, 2) + '\n' +
-        "Event details" + JSON.stringify(e.detail, null, 2) + '\n\n';
+        "Event type:" + e.type + '\n';// +
+        //"Event details" + e.detail + '\n\n';
+        //"Event details" + JSON.stringify(e.detail, null, 2) + '\n\n';
       console.log(e);
     }
     
