@@ -44,8 +44,8 @@
       },
       "icon": "https://test.puma.tech/puma_round_200.png",    
       "callToAction": {        
-        "default": "Get the key on Rinkeby",
-        "expired": "The lock has expired. Please renew",
+        "default": "Get the key on Goerli",
+        "expired": "The key has expired. Please renew",
         "metadata": "Please fill in the following:"   
       },
       "metadataInputs": [ 
@@ -56,6 +56,9 @@
     function logEvent(event){
       var container = document.getElementById("container")
       logTo(container, event)
+
+      console.log(event.detail)
+      console.log(event.detail["locks"])
 
       var locks = event.detail.locks
 
@@ -81,10 +84,9 @@
     function logTo(container, e){
       console.log(e)
       container.innerText = container.innerText + 
-        "Event type:" + e.type + '\n';// +
-        //"Event details" + e.detail + '\n\n';
+        "Event type:" + e.type + '\n' +
+        "Event details" + e.detail + '\n\n';
         //"Event details" + JSON.stringify(e.detail, null, 2) + '\n\n';
-      console.log(e);
     }
     
     function logString(container, s){
