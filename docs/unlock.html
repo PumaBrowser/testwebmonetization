@@ -54,27 +54,21 @@
     }
 
     function logEvent(event){
-      console.log("log event called")
-      console.log(event)
-
+      
       var container = document.getElementById("container")
-      console.log(container)
       logTo(container, event)
       
       var locks = event.detail["locks"]
-      console.log(locks)
-
+      
       if ( typeof locks === 'undefined' ){
         locks = Object.keys(window.unlockProtocolConfig.locks)
       }
-      console.log(locks)
+      
 
 
       locks.forEach(function(lock){
         upperLock = lock.toUpperCase()
       	container = document.getElementById(upperLock.substr(15) + "container")
-        console.log(container)
-        console.log(upperLock.substr(15) + "container")
         logTo(container, event)
         if (event.detail.state == "unlocked"){
           if(document.getElementById(upperLock.substr(15) + "locked") != null){
@@ -107,7 +101,7 @@
       
       container.innerText = container.innerText + 
         "String:" + s + '\n\n';
-      console.log(s);
+      //console.log(s);
     }
 
     window.addEventListener('unlockProtocol.status', logEvent)
