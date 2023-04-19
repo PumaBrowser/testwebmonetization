@@ -572,7 +572,7 @@
         var params = [];
         switch(func) {
             case "eth_sign":
-                params = [window.APITests.account.address, window.APITests.web3.utils.toHex("Hello World from Puma wallet API")]
+                params = [window.APITests.web3.utils.toHex("Hello World from Puma wallet API"), window.APITests.account.address]
                 break;
             case "eth_signTypedData_v3":
             case "eth_signTypedData_v4":
